@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}Login | Healthy Plate Quest{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-5">
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-4">
+                <h2 class="text-center mb-4">🔑 Log In</h2>
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Username or Email</label>
+                        <input type="text" name="identifier" class="form-control" required autofocus>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Password</label>
+                        <input type="password" name="password" class="form-control" required>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" name="remember" class="form-check-input" id="remember">
+                        <label class="form-check-label" for="remember">Remember me</label>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100">Log In</button>
+                </form>
+                <hr>
+                <p class="text-center mb-0">New here? <a href="{{ url_for('auth.register') }}">Start your quest!</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

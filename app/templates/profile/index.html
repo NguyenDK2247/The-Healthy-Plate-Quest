@@ -1,6 +1,172 @@
 {% extends 'base.html' %}
 {% block title %}My Profile | Healthy Plate Quest{% endblock %}
+
+{% block extra_css %}
+<style>
+  .badge-card { border-radius:12px; text-align:center; transition:transform .15s; cursor:default; }
+  .badge-card:hover { transform:translateY(-3px); }
+  .badge-icon { font-size:2.5rem; }
+  .rarity-common    { border-top:3px solid #adb5bd; }
+  .rarity-rare      { border-top:3px solid #0d6efd; }
+  .rarity-epic      { border-top:3px solid #6f42c1; }
+  .rarity-legendary { border-top:3px solid #fd7e14; background:linear-gradient(135deg,#fff8f0,#fff3e0); }
+  .featured-star { position:absolute; top:8px; right:8px; font-size:.85rem; }
+  .stat-box { border-radius:12px; text-align:center; padding:1.2rem; }
+</style>
+{% endblock %}
+
 {% block content %}
-<h2>👤 Profile</h2>
-<p class="text-muted">WIP</p>
+<div class="row g-4">
+
+  <!-- Left: Profile card -->
+  <div class="col-md-4">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body text-center p-4">
+        <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center fw-bold mx-auto mb-3"
+             style="width:80px;height:80px;font-size:2rem;">
+          {{ current_user.display_name[0]|upper }}
+        </div>
+        <h4 class="fw-bold mb-0">{{ current_user.display_name }}</h4>
+        <p class="text-muted mb-1">@{{ current_user.username }}</p>
+        {% if current_user.bio %}
+        <p class="small text-muted">{{ current_user.bio }}</p>
+        {% endif %}
+        <span class="badge bg-success fs-6 mb-3">Level {{ current_user.level }} · {{ current_user.level_title }}</span>
+
+        <!-- XP bar -->
+        <div class="mb-3">
+          <div class="d-flex justify-content-between small text-muted mb-1">
+            <span>{{ current_user.xp_points }} XP</span>
+            <span>+{{ current_user.xp_for_next_level() }} to next level</span>
+          </div>
+          <div class="progress" style="height:10px;border-radius:20px;">
+            <div class="progress-bar bg-warning" style="width:{{ current_user.xp_progress_percent() }}%"></div>
+          </div>
+        </div>
+
+        <!-- Stats grid -->
+        <div class="row g-2 mb-3">
+          <div class="col-4">
+            <div class="stat-box bg-light">
+              <div class="fw-bold text-danger fs-5">{{ current_user.current_streak }}</div>
+              <div class="text-muted" style="font-size:.7rem">🔥 Streak</div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="stat-box bg-light">
+              <div class="fw-bold text-primary fs-5">{{ current_user.total_meals_logged }}</div>
+              <div class="text-muted" style="font-size:.7rem">🍽 Meals</div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="stat-box bg-light">
+              <div class="fw-bold text-success fs-5">{{ current_user.total_quests_completed }}</div>
+              <div class="text-muted" style="font-size:.7rem">⚔️ Quests</div>
+            </div>
+          </div>
+        </div>
+
+        <a href="{{ url_for('profile.edit') }}" class="btn btn-outline-success btn-sm w-100">
+          <i class="bi bi-pencil"></i> Edit Profile
+        </a>
+      </div>
+    </div>
+
+    <!-- Goals & Preferences -->
+    <div class="card border-0 shadow-sm mt-3">
+      <div class="card-body p-3">
+        <h6 class="fw-bold mb-3">🎯 My Goals</h6>
+        <div class="d-flex flex-column gap-2">
+          <div class="d-flex justify-content-between">
+            <span class="text-muted small">Nutrition Goal</span>
+            <span class="badge bg-light text-dark">{{ current_user.nutrition_goal.replace('_',' ')|title }}</span>
+          </div>
+          <div class="d-flex justify-content-between">
+            <span class="text-muted small">Diet</span>
+            <span class="badge bg-light text-dark">{{ current_user.dietary_preference|title }}</span>
+          </div>
+          {% if current_user.dietary_restrictions %}
+          <div class="d-flex justify-content-between">
+            <span class="text-muted small">Restrictions</span>
+            <span class="text-muted small">{{ current_user.dietary_restrictions }}</span>
+          </div>
+          {% endif %}
+          <div class="d-flex justify-content-between">
+            <span class="text-muted small">Best Streak</span>
+            <span class="badge bg-warning text-dark">{{ current_user.longest_streak }} days 🔥</span>
+          </div>
+          <div class="d-flex justify-content-between">
+            <span class="text-muted small">Member Since</span>
+            <span class="text-muted small">{{ current_user.created_at.strftime('%b %Y') }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right: Badges -->
+  <div class="col-md-8">
+
+    <!-- Featured badges -->
+    {% if featured %}
+    <div class="mb-4">
+      <h5 class="fw-bold mb-3">⭐ Featured Badges</h5>
+      <div class="row g-3">
+        {% for ub in featured %}
+        <div class="col-4">
+          <div class="card border-0 shadow-sm badge-card rarity-{{ ub.badge.rarity }} position-relative">
+            <div class="card-body py-3">
+              <span class="featured-star">⭐</span>
+              <div class="badge-icon">{{ ub.badge.icon }}</div>
+              <div class="fw-semibold mt-1" style="font-size:.9rem">{{ ub.badge.name }}</div>
+              <div class="text-muted" style="font-size:.75rem">{{ ub.badge.description }}</div>
+              <form action="{{ url_for('profile.feature_badge', ub_id=ub.id) }}" method="POST" class="mt-2">
+                <button class="btn btn-outline-warning btn-sm" style="font-size:.7rem">Unfeature</button>
+              </form>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- All badges -->
+    <h5 class="fw-bold mb-3">🏅 Badge Collection
+      <span class="badge bg-light text-muted ms-1" style="font-size:.8rem">{{ all_user_badges|length }} earned</span>
+    </h5>
+
+    {% if all_user_badges %}
+    <div class="row g-3">
+      {% for ub in all_user_badges %}
+      <div class="col-md-4 col-6">
+        <div class="card border-0 shadow-sm badge-card rarity-{{ ub.badge.rarity }} position-relative">
+          <div class="card-body py-3">
+            {% if ub.is_featured %}<span class="featured-star">⭐</span>{% endif %}
+            <div class="badge-icon">{{ ub.badge.icon }}</div>
+            <div class="fw-semibold mt-1" style="font-size:.9rem">{{ ub.badge.name }}</div>
+            <div class="text-muted" style="font-size:.75rem">{{ ub.badge.description }}</div>
+            <div class="text-muted mt-1" style="font-size:.7rem">
+              Earned {{ ub.earned_at.strftime('%b %d, %Y') }}
+            </div>
+            {% if not ub.is_featured %}
+            <form action="{{ url_for('profile.feature_badge', ub_id=ub.id) }}" method="POST" class="mt-2">
+              <button class="btn btn-outline-secondary btn-sm" style="font-size:.7rem">Feature</button>
+            </form>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5 text-muted">
+      <div style="font-size:3rem">🏅</div>
+      <p class="mt-2">No badges yet — complete quests and log meals to earn your first one!</p>
+      <a href="{{ url_for('quests.index') }}" class="btn btn-success btn-sm mt-1">Go to Quest Board</a>
+    </div>
+    {% endif %}
+  </div>
+
+</div>
 {% endblock %}

@@ -1,0 +1,129 @@
+/* ── Global ── */
+body { background:#f6fdf6; font-family:'Segoe UI', system-ui, sans-serif;
+       color:#212529; transition:background .2s, color .2s; }
+
+/* ── Cards ── */
+.card { border-radius:14px; }
+
+/* ── Navbar ── */
+.navbar-brand { font-size:1.25rem; letter-spacing:-.01em; }
+.navbar .nav-link { font-size:.9rem; }
+
+/* ── Alerts ── */
+.alert strong { font-weight:700; }
+
+/* ── Buttons ── */
+.btn { border-radius:8px; }
+.btn-success { background:#2d9e5f; border-color:#2d9e5f; }
+.btn-success:hover { background:#237a4a; border-color:#237a4a; }
+
+/* ── Progress bars ── */
+.progress { border-radius:20px; }
+
+/* ── Badges ── */
+.badge { border-radius:6px; }
+
+/* ── Rarity glow effects ── */
+.rarity-legendary { box-shadow:0 0 0 2px #fd7e14; }
+.rarity-epic      { box-shadow:0 0 0 2px #6f42c1; }
+
+/* ── Animations ── */
+@keyframes xp-pop {
+  0%   { transform:scale(1); }
+  50%  { transform:scale(1.4); color:#ffc107; }
+  100% { transform:scale(1); }
+}
+.xp-flash { animation:xp-pop .5s ease; }
+
+/* ════════════════════════════════
+   DARK MODE
+   ════════════════════════════════ */
+[data-theme="dark"] {
+    --bg:        #121212;
+    --bg-card:   #1e1e1e;
+    --bg-input:  #2a2a2a;
+    --text:      #e8e8e8;
+    --text-muted:#9e9e9e;
+    --border:    #333;
+}
+
+[data-theme="dark"] body {
+    background: var(--bg);
+    color: var(--text);
+}
+
+[data-theme="dark"] .card {
+    background: var(--bg-card);
+    border-color: var(--border);
+    color: var(--text);
+}
+
+[data-theme="dark"] .bg-light {
+    background: #2a2a2a !important;
+}
+
+[data-theme="dark"] .text-muted {
+    color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .dropdown-menu {
+    background: var(--bg-card);
+    border-color: var(--border);
+}
+
+[data-theme="dark"] .dropdown-item {
+    color: var(--text);
+}
+
+[data-theme="dark"] .dropdown-item:hover {
+    background: #2a2a2a;
+}
+
+[data-theme="dark"] .form-control,
+[data-theme="dark"] .form-select {
+    background: var(--bg-input);
+    border-color: var(--border);
+    color: var(--text);
+}
+
+[data-theme="dark"] .form-control:focus,
+[data-theme="dark"] .form-select:focus {
+    background: var(--bg-input);
+    color: var(--text);
+    border-color: #2d9e5f;
+    box-shadow: 0 0 0 .2rem rgba(45,158,95,.25);
+}
+
+[data-theme="dark"] .alert-light,
+[data-theme="dark"] .alert-secondary {
+    background: #2a2a2a;
+    border-color: var(--border);
+    color: var(--text);
+}
+
+[data-theme="dark"] .border,
+[data-theme="dark"] .border-bottom {
+    border-color: var(--border) !important;
+}
+
+[data-theme="dark"] .progress {
+    background: #333;
+}
+
+[data-theme="dark"] .modal-content {
+    background: var(--bg-card);
+    color: var(--text);
+}
+
+[data-theme="dark"] .btn-outline-secondary {
+    color: var(--text-muted);
+    border-color: var(--border);
+}
+
+[data-theme="dark"] .btn-close {
+    filter: invert(1);
+}
+
+[data-theme="dark"] hr {
+    border-color: var(--border);
+}

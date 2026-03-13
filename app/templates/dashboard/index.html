@@ -1,97 +1,204 @@
 {% extends 'base.html' %}
 {% block title %}Dashboard | Healthy Plate Quest{% endblock %}
+
+{% block extra_css %}
+<style>
+  .stat-ring { position:relative; width:100px; height:100px; }
+  .xp-bar-wrap { height:14px; border-radius:20px; overflow:hidden; background:#e9ecef; }
+  .xp-bar { height:100%; border-radius:20px; background:linear-gradient(90deg,#ffc107,#fd7e14);
+             transition:width .6s ease; }
+  .quick-stat { border-radius:14px; text-align:center; padding:1rem; }
+  .quest-mini { border-radius:12px; border-left:4px solid #28a745; }
+  .quest-mini.medium { border-left-color:#fd7e14; }
+  .quest-mini.hard { border-left-color:#dc3545; }
+  .tip-card { border-radius:14px; border-left:4px solid #0dcaf0; }
+  @keyframes popIn { from { transform:scale(.8); opacity:0; } to { transform:scale(1); opacity:1; } }
+  .level-up-badge { animation:popIn .4s ease forwards; }
+</style>
+{% endblock %}
+
 {% block content %}
+
+<!-- Level-up modal (shown via flash if leveled up) -->
+{% for category, message in get_flashed_messages(with_categories=true) %}
+  {% if 'LEVEL UP' in message %}
+  <div class="modal fade" id="levelUpModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow text-center p-4">
+        <div style="font-size:4rem" class="level-up-badge">🎉</div>
+        <h3 class="fw-bold mt-2">LEVEL UP!</h3>
+        <p class="text-muted fs-5">You are now <strong>Level {{ current_user.level }}</strong></p>
+        <p class="text-success fw-bold fs-4">{{ current_user.level_title }}</p>
+        <button class="btn btn-success mt-2" data-bs-dismiss="modal">Keep questing!</button>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+{% endfor %}
+
 <div class="row g-4">
-    <div class="col-md-4">
-        <div class="card border-0 shadow-sm">
-            <div class="card-body text-center p-4">
-                <div class="display-4 mb-2">🧑‍🍳</div>
-                <h4 class="fw-bold mb-0">{{ current_user.display_name }}</h4>
-                <p class="text-muted mb-1">{{ current_user.level_title }}</p>
-                <span class="badge bg-success fs-6">Level {{ current_user.level }}</span>
-                <div class="mt-3">
-                    <div class="d-flex justify-content-between small text-muted mb-1">
-                        <span>XP Progress</span>
-                        <span>{{ current_user.xp_points }} XP</span>
-                    </div>
-                    <div class="progress" style="height: 12px;">
-                        <div class="progress-bar bg-warning" style="width: {{ current_user.xp_progress_percent() }}%"></div>
-                    </div>
-                    <small class="text-muted">{{ current_user.xp_for_next_level() }} XP to next level</small>
-                </div>
-                <div class="row mt-3 text-center">
-                    <div class="col-4">
-                        <div class="fw-bold text-danger fs-5">{{ current_user.current_streak }}</div>
-                        <div class="text-muted small">🔥 Streak</div>
-                    </div>
-                    <div class="col-4">
-                        <div class="fw-bold text-primary fs-5">{{ current_user.total_meals_logged }}</div>
-                        <div class="text-muted small">🍽 Meals</div>
-                    </div>
-                    <div class="col-4">
-                        <div class="fw-bold text-success fs-5">{{ current_user.total_quests_completed }}</div>
-                        <div class="text-muted small">⚔️ Quests</div>
-                    </div>
-                </div>
-            </div>
+
+  <!-- ── Player card ── -->
+  <div class="col-md-4 col-lg-3">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body text-center p-4">
+        <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center fw-bold mx-auto mb-3"
+             style="width:72px;height:72px;font-size:1.8rem;">
+          {{ current_user.display_name[0]|upper }}
         </div>
+        <h5 class="fw-bold mb-0">{{ current_user.display_name }}</h5>
+        <div class="text-muted small mb-2">{{ current_user.level_title }}</div>
+        <span class="badge bg-success mb-3">Level {{ current_user.level }}</span>
+
+        <div class="xp-bar-wrap mb-1">
+          <div class="xp-bar" style="width:{{ current_user.xp_progress_percent() }}%"></div>
+        </div>
+        <div class="d-flex justify-content-between" style="font-size:.75rem; color:#6c757d;">
+          <span>{{ current_user.xp_points }} XP total</span>
+          <span>+{{ current_user.xp_for_next_level() }} to next</span>
+        </div>
+
+        <hr class="my-3">
+        <div class="row g-2">
+          <div class="col-4">
+            <div class="quick-stat bg-light">
+              <div class="fw-bold text-danger">{{ current_user.current_streak }}</div>
+              <div style="font-size:.65rem;color:#6c757d;">🔥 Streak</div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="quick-stat bg-light">
+              <div class="fw-bold text-primary">{{ current_user.total_meals_logged }}</div>
+              <div style="font-size:.65rem;color:#6c757d;">🍽 Meals</div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="quick-stat bg-light">
+              <div class="fw-bold text-success">{{ current_user.total_quests_completed }}</div>
+              <div style="font-size:.65rem;color:#6c757d;">⚔️ Quests</div>
+            </div>
+          </div>
+        </div>
+
+        {% if my_rank %}
+        <div class="mt-3 p-2 bg-warning bg-opacity-10 rounded">
+          <div class="fw-bold text-warning">
+            {% if my_rank == 1 %}🥇{% elif my_rank == 2 %}🥈{% elif my_rank == 3 %}🥉{% else %}#{{ my_rank }}{% endif %}
+            Weekly Rank
+          </div>
+          <div style="font-size:.75rem;color:#6c757d;">
+            {{ my_entry.xp_this_week if my_entry else 0 }} XP this week
+          </div>
+        </div>
+        {% endif %}
+      </div>
     </div>
-    <div class="col-md-8">
-        <div class="card border-0 shadow-sm mb-4">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="fw-bold mb-0">📊 Today's Nutrition</h5>
-                    <a href="{{ url_for('food_log.index') }}" class="btn btn-sm btn-success">+ Log Meal</a>
-                </div>
-                <div class="row text-center">
-                    <div class="col">
-                        <div class="fs-4 fw-bold text-danger">{{ today_totals.calories | int }}</div>
-                        <small class="text-muted">Calories</small>
-                    </div>
-                    <div class="col">
-                        <div class="fs-4 fw-bold text-primary">{{ today_totals.protein_g | round(1) }}g</div>
-                        <small class="text-muted">Protein</small>
-                    </div>
-                    <div class="col">
-                        <div class="fs-4 fw-bold text-warning">{{ today_totals.carbs_g | round(1) }}g</div>
-                        <small class="text-muted">Carbs</small>
-                    </div>
-                    <div class="col">
-                        <div class="fs-4 fw-bold text-success">{{ today_totals.fat_g | round(1) }}g</div>
-                        <small class="text-muted">Fat</small>
-                    </div>
-                    <div class="col">
-                        <div class="fs-4 fw-bold text-info">{{ today_totals.fiber_g | round(1) }}g</div>
-                        <small class="text-muted">Fiber</small>
-                    </div>
-                </div>
-            </div>
+  </div>
+
+  <!-- ── Main content ── -->
+  <div class="col-md-8 col-lg-9">
+
+    <!-- Today's nutrition -->
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-body p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-bold mb-0">📊 Today's Nutrition</h5>
+          <a href="{{ url_for('food_log.index') }}" class="btn btn-sm btn-success">
+            <i class="bi bi-plus-circle"></i> Log Meal
+          </a>
         </div>
-        <div class="card border-0 shadow-sm">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="fw-bold mb-0">⚔️ Active Quests</h5>
-                    <a href="{{ url_for('quests.index') }}" class="btn btn-sm btn-outline-success">View All</a>
-                </div>
-                {% if active_quests %}
-                    {% for uq in active_quests %}
-                    <div class="mb-3">
-                        <div class="d-flex justify-content-between">
-                            <span>{{ uq.quest.icon }} <strong>{{ uq.quest.title }}</strong></span>
-                            <span class="badge bg-warning text-dark">+{{ uq.quest.xp_reward }} XP</span>
-                        </div>
-                        <small class="text-muted">{{ uq.quest.description }}</small>
-                        <div class="progress mt-1" style="height: 8px;">
-                            <div class="progress-bar bg-success" style="width: {{ uq.progress_percent() }}%"></div>
-                        </div>
-                        <small class="text-muted">{{ uq.progress }}/{{ uq.quest.criteria_target }}</small>
-                    </div>
-                    {% endfor %}
-                {% else %}
-                    <p class="text-muted">No active quests. <a href="{{ url_for('quests.index') }}">Browse quests!</a></p>
-                {% endif %}
-            </div>
+
+        {% if today_totals.meal_count == 0 %}
+        <div class="text-center py-3 text-muted">
+          <div style="font-size:2.5rem">🍽</div>
+          <p class="mt-2">No meals logged today yet. Log your first meal to start earning XP!</p>
         </div>
+        {% else %}
+        <div class="row text-center g-3 mb-3">
+          {% for label, value, unit, color in [
+            ('Calories', today_totals.calories|int, 'kcal', 'danger'),
+            ('Protein', today_totals.protein_g|round(1), 'g', 'primary'),
+            ('Carbs', today_totals.carbs_g|round(1), 'g', 'warning'),
+            ('Fat', today_totals.fat_g|round(1), 'g', 'success'),
+            ('Fiber', today_totals.fiber_g|round(1), 'g', 'info'),
+          ] %}
+          <div class="col">
+            <div class="fw-bold text-{{ color }} fs-5">{{ value }}<small class="text-muted fs-6"> {{ unit }}</small></div>
+            <div style="font-size:.75rem;color:#6c757d;">{{ label }}</div>
+          </div>
+          {% endfor %}
+        </div>
+
+        <!-- Recent logs -->
+        <div style="font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#6c757d;" class="mb-2">Today's Meals</div>
+        {% for log in recent_logs %}
+        <div class="d-flex align-items-center gap-2 py-1 border-bottom">
+          <span class="badge bg-light text-muted" style="font-size:.7rem">{{ log.meal_type|title if log.meal_type else '—' }}</span>
+          <span class="flex-grow-1 small">{{ log.food_name }}</span>
+          <span class="text-muted small">{{ log.calories|int }} kcal</span>
+          <span class="badge bg-success" style="font-size:.65rem">+{{ log.xp_awarded }} XP</span>
+        </div>
+        {% endfor %}
+        {% endif %}
+      </div>
     </div>
+
+    <!-- Active quests -->
+    <div class="card border-0 shadow-sm">
+      <div class="card-body p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-bold mb-0">⚔️ Active Quests</h5>
+          <a href="{{ url_for('quests.index') }}" class="btn btn-sm btn-outline-success">View All</a>
+        </div>
+
+        {% if active_quests %}
+        <div class="d-flex flex-column gap-3">
+          {% for uq in active_quests %}
+          <div class="card border-0 bg-light quest-mini {{ uq.quest.difficulty }}">
+            <div class="card-body py-3 px-3">
+              <div class="d-flex justify-content-between align-items-start">
+                <div class="d-flex gap-2">
+                  <span style="font-size:1.5rem">{{ uq.quest.icon }}</span>
+                  <div>
+                    <div class="fw-semibold">{{ uq.quest.title }}</div>
+                    <div class="text-muted small">{{ uq.quest.description }}</div>
+                  </div>
+                </div>
+                <span class="badge bg-warning text-dark ms-2" style="white-space:nowrap">+{{ uq.quest.xp_reward }} XP</span>
+              </div>
+              <div class="progress mt-2" style="height:6px;border-radius:20px;">
+                <div class="progress-bar bg-success" style="width:{{ uq.progress_percent() }}%"></div>
+              </div>
+              <div class="d-flex justify-content-between mt-1">
+                <small class="text-muted">{{ uq.progress }} / {{ uq.quest.criteria_target }}</small>
+                <small class="text-muted">{{ uq.progress_percent() }}%</small>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-3 text-muted">
+          <p>No active quests. <a href="{{ url_for('quests.index') }}">Head to the quest board!</a></p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+  </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Show level-up modal if the page has a level-up flash
+{% for cat, msg in get_flashed_messages(with_categories=true) %}
+  {% if 'LEVEL UP' in msg %}
+  document.addEventListener('DOMContentLoaded', () => {
+    const modal = new bootstrap.Modal(document.getElementById('levelUpModal'));
+    modal.show();
+  });
+  {% endif %}
+{% endfor %}
+</script>
 {% endblock %}

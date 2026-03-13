@@ -8,6 +8,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     {% block extra_css %}{% endblock %}
+    <script>
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
 </head>
 <body>
 
@@ -34,6 +39,11 @@
                         ⭐ {{ current_user.xp_points }} XP &nbsp;|&nbsp;
                         Lv.{{ current_user.level }} {{ current_user.level_title }}
                     </span>
+                </li>
+                <li class="nav-item d-flex align-items-center px-2">
+                    <button id="darkModeToggle" class="btn btn-sm btn-outline-light" title="Toggle dark mode">
+                        <i class="bi bi-moon-fill" id="darkModeIcon"></i>
+                    </button>
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
@@ -67,7 +77,30 @@
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+<script>
+    const toggle = document.getElementById('darkModeToggle');
+    const icon = document.getElementById('darkModeIcon');
+
+    function applyDarkMode(enabled) {
+        if (enabled) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            icon.className = 'bi bi-sun-fill';
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+            icon.className = 'bi bi-moon-fill';
+        }
+    }
+
+    applyDarkMode(localStorage.getItem('darkMode') === 'true');
+
+    if (toggle) {
+        toggle.addEventListener('click', () => {
+            const isDark = localStorage.getItem('darkMode') === 'true';
+            localStorage.setItem('darkMode', !isDark);
+            applyDarkMode(!isDark);
+        });
+    }
+</script>
 {% block extra_js %}{% endblock %}
 </body>
 </html>
-```

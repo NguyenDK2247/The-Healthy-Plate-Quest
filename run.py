@@ -8,13 +8,8 @@ app = create_app('development')
 @app.shell_context_processor
 def make_shell_context():
     return {
-        'db': db,
-        'User': User,
-        'FoodLog': FoodLog,
-        'Quest': Quest,
-        'UserQuest': UserQuest,
-        'Badge': Badge,
-        'UserBadge': UserBadge,
+        'db': db, 'User': User, 'FoodLog': FoodLog, 'Quest': Quest,
+        'UserQuest': UserQuest, 'Badge': Badge, 'UserBadge': UserBadge,
         'LeaderboardEntry': LeaderboardEntry,
     }
 
@@ -25,44 +20,58 @@ def init_db():
     db.create_all()
     print('✅ Database tables created.')
 
-    # Seed default badges if not already present
+    # Seed badges
     if Badge.query.count() == 0:
         for badge_data in DEFAULT_BADGES:
-            badge = Badge(**badge_data)
-            db.session.add(badge)
+            db.session.add(Badge(**badge_data))
         db.session.commit()
-        print(f'✅ Seeded {len(DEFAULT_BADGES)} default badges.')
+        print(f'✅ Seeded {len(DEFAULT_BADGES)} badges.')
     else:
         print('ℹ️  Badges already seeded.')
 
-    # Seed a few starter quests
+    # Seed quests
     if Quest.query.count() == 0:
         starter_quests = [
-            Quest(title='Veggie Starter', description='Log 3 vegetable servings today.',
-                  quest_type='daily', category='vegetables', difficulty='easy',
-                  xp_reward=30, icon='🥦', criteria_type='log_vegetables', criteria_target=3),
-            Quest(title='Rainbow Plate', description='Eat 5 different colored foods today.',
-                  quest_type='daily', category='variety', difficulty='medium',
-                  xp_reward=50, icon='🌈', criteria_type='color_variety', criteria_target=5),
-            Quest(title='Protein Week', description='Log a protein source for 4 days this week.',
-                  quest_type='weekly', category='protein', difficulty='medium',
-                  xp_reward=100, icon='💪', criteria_type='log_protein_days', criteria_target=4),
-            Quest(title='Fiber Hero', description='Log at least 25g of fiber in one day.',
-                  quest_type='weekly', category='fiber', difficulty='hard',
-                  xp_reward=80, icon='🌾', criteria_type='daily_fiber_goal', criteria_target=25),
-            Quest(title='Breakfast Champion', description='Log breakfast 5 days in a row.',
-                  quest_type='weekly', category='consistency', difficulty='medium',
-                  xp_reward=75, icon='🌅', criteria_type='log_breakfast_streak', criteria_target=5),
+            # Daily
+            Quest(title='Veggie Starter', icon='🥦', quest_type='daily', category='vegetables',
+                  difficulty='easy', xp_reward=30, criteria_type='log_vegetables', criteria_target=3,
+                  description='Log 3 vegetable servings today.'),
+            Quest(title='Rainbow Plate', icon='🌈', quest_type='daily', category='variety',
+                  difficulty='medium', xp_reward=50, criteria_type='color_variety', criteria_target=5,
+                  description='Eat 5 different colored foods today.'),
+            Quest(title='Breakfast Champion', icon='🌅', quest_type='daily', category='consistency',
+                  difficulty='easy', xp_reward=25, criteria_type='log_breakfast', criteria_target=1,
+                  description='Log your breakfast today.'),
+            Quest(title='Fruit Power', icon='🍓', quest_type='daily', category='fruit',
+                  difficulty='easy', xp_reward=25, criteria_type='log_fruit', criteria_target=2,
+                  description='Log 2 fruit servings today.'),
+            Quest(title='Protein Pack', icon='🥩', quest_type='daily', category='protein',
+                  difficulty='medium', xp_reward=40, criteria_type='log_protein', criteria_target=3,
+                  description='Log 3 protein-rich foods today.'),
+            # Weekly
+            Quest(title='Protein Week', icon='💪', quest_type='weekly', category='protein',
+                  difficulty='medium', xp_reward=100, criteria_type='log_protein_days', criteria_target=4,
+                  description='Log a protein source for 4 days this week.'),
+            Quest(title='Fiber Hero', icon='🌾', quest_type='weekly', category='fiber',
+                  difficulty='hard', xp_reward=80, criteria_type='daily_fiber_goal', criteria_target=25,
+                  description='Log at least 25g of fiber in one day this week.'),
+            Quest(title='Veggie Week', icon='🥗', quest_type='weekly', category='vegetables',
+                  difficulty='medium', xp_reward=90, criteria_type='log_vegetables_week', criteria_target=15,
+                  description='Log 15 vegetable servings over the week.'),
+            Quest(title='Meal Logger', icon='📋', quest_type='weekly', category='consistency',
+                  difficulty='easy', xp_reward=60, criteria_type='log_meals_week', criteria_target=14,
+                  description='Log at least 14 meals this week (2 per day).'),
         ]
         for q in starter_quests:
             db.session.add(q)
         db.session.commit()
-        print(f'✅ Seeded {len(starter_quests)} starter quests.')
+        print(f'✅ Seeded {len(starter_quests)} quests.')
     else:
         print('ℹ️  Quests already seeded.')
 
-    print('🎉 Database initialization complete!')
+    print('🎉 Database ready!')
 
 
 if __name__ == '__main__':
     app.run(debug=True)
+    

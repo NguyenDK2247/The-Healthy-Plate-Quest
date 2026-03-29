@@ -2,42 +2,42 @@
 {% block title %}Browse Quests | Healthy Plate Quest{% endblock %}
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
-  <div>
-    <h2 class="fw-bold mb-0">🔍 Browse Quests</h2>
-    <p class="text-muted mb-0">Pick a challenge and add it to your active quests.</p>
-  </div>
-  <a href="{{ url_for('quests.index') }}" class="btn btn-outline-secondary">← My Quests</a>
+    <div>
+        <h2 class="fw-bold mb-0">🔍 Browse Quests</h2>
+        <p class="text-muted mb-0">Pick a challenge and add it to your active quests.</p>
+    </div>
+    <a href="{{ url_for('quests.index') }}" class="btn btn-outline-secondary">← My Quests</a>
 </div>
 
 {% if available %}
 <div class="row g-3">
-  {% for quest in available %}
-  <div class="col-md-4">
-    <div class="card border-0 shadow-sm h-100" style="border-left:4px solid {% if quest.difficulty == 'easy' %}#28a745{% elif quest.difficulty == 'medium' %}#fd7e14{% else %}#dc3545{% endif %}; border-radius:14px;">
-      <div class="card-body">
-        <div class="d-flex align-items-start gap-3 mb-3">
-          <span style="font-size:2rem">{{ quest.icon }}</span>
-          <div>
-            <div class="fw-bold">{{ quest.title }}</div>
-            <p class="text-muted small mb-1">{{ quest.description }}</p>
-            <div class="d-flex gap-2 flex-wrap">
-              <span class="badge bg-warning text-dark" style="font-size:.75rem">+{{ quest.xp_reward }} XP</span>
-              <span class="badge {% if quest.difficulty == 'easy' %}bg-success{% elif quest.difficulty == 'medium' %}bg-warning text-dark{% else %}bg-danger{% endif %}" style="font-size:.75rem">{{ quest.difficulty|capitalize }}</span>
-              <span class="badge bg-light text-muted" style="font-size:.75rem">{{ quest.quest_type|capitalize }}</span>
+    {% for quest in available %}
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100" style="border-left:4px solid {% if quest.difficulty == 'easy' %}#28a745{% elif quest.difficulty == 'medium' %}#fd7e14{% else %}#dc3545{% endif %}; border-radius:14px;">
+        <div class="card-body">
+            <div class="d-flex align-items-start gap-3 mb-3">
+            <span style="font-size:2rem">{{ quest.icon }}</span>
+            <div>
+                <div class="fw-bold">{{ quest.title }}</div>
+                <p class="text-muted small mb-1">{{ quest.description }}</p>
+                <div class="d-flex gap-2 flex-wrap">
+                <span class="badge bg-warning text-dark" style="font-size:.75rem">+{{ quest.xp_reward }} XP</span>
+                <span class="badge {% if quest.difficulty == 'easy' %}bg-success{% elif quest.difficulty == 'medium' %}bg-warning text-dark{% else %}bg-danger{% endif %}" style="font-size:.75rem">{{ quest.difficulty|capitalize }}</span>
+                <span class="badge bg-light text-muted" style="font-size:.75rem">{{ quest.quest_type|capitalize }}</span>
+                </div>
             </div>
-          </div>
+            </div>
+            <form action="{{ url_for('quests.accept', quest_id=quest.id) }}" method="POST">
+            <button class="btn btn-success btn-sm w-100">Accept Quest</button>
+            </form>
         </div>
-        <form action="{{ url_for('quests.accept', quest_id=quest.id) }}" method="POST">
-          <button class="btn btn-success btn-sm w-100">Accept Quest</button>
-        </form>
-      </div>
+        </div>
     </div>
-  </div>
-  {% endfor %}
+    {% endfor %}
 </div>
 {% else %}
 <div class="alert alert-success">
-  <strong>All caught up!</strong> You have all available quests in your queue. Check back tomorrow for new daily quests!
+    <strong>All caught up!</strong> You have all available quests in your queue. Check back tomorrow for new daily quests!
 </div>
 {% endif %}
 {% endblock %}

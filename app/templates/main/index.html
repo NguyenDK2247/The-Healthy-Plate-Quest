@@ -1,12 +1,86 @@
 {% extends 'base.html' %}
-{% block title %}Welcome | The Healthy Plate Quest{% endblock %}
+{% block title %}The Healthy Plate Quest — Level Up Your Nutrition{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hero-stat { border-radius:14px; padding:1.25rem; text-align:center; }
+    .hero-stat .number { font-size:2rem; font-weight:800; font-family:var(--font-head); }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="text-center py-5">
-    <h1 class="display-4 fw-bold text-success">🥗 The Healthy Plate Quest</h1>
-    <p class="lead text-muted">Level up your nutrition. Complete quests. Eat better — one meal at a time.</p>
-    <div class="mt-4">
-        <a href="{{ url_for('auth.register') }}" class="btn btn-success btn-lg me-2">Start Your Quest</a>
-        <a href="{{ url_for('auth.login') }}" class="btn btn-outline-success btn-lg">Log In</a>
+
+<!-- Hero -->
+<section class="hero-section rounded-4 mb-5 px-3 px-md-5">
+    <div class="row align-items-center g-5 py-5">
+        <div class="col-lg-6 fade-in-up">
+        <div class="hero-emoji mb-3">🥗</div>
+        <h1 class="display-5 fw-bold mb-3" style="font-family:var(--font-head);line-height:1.2;">
+            Level up your<br>
+            <span style="color:var(--green);">nutrition.</span>
+        </h1>
+        <p class="lead text-muted mb-4">
+            Track meals, complete challenges, and get personalised coaching
+            from Coach Vita — your AI nutrition guide. Eating healthy has never felt this fun.
+        </p>
+        <div class="d-flex flex-wrap gap-3">
+            <a href="{{ url_for('auth.register') }}" class="btn btn-success btn-lg pulse">
+            🚀 Start Your Quest — It's Free
+            </a>
+            <a href="{{ url_for('auth.login') }}" class="btn btn-outline-success btn-lg">
+            Log In
+            </a>
+        </div>
+        </div>
+        <div class="col-lg-6 hide-mobile">
+        <div class="row g-3">
+            {% for emoji, title, desc in [
+            ('⭐','Earn XP','Log meals and complete quests to level up'),
+            ('⚔️','Daily Quests','Fresh challenges every day to keep you motivated'),
+            ('🤖','Coach Vita','Your personal AI nutrition coach, always available'),
+            ('🏆','Leaderboard','Compete with friends and climb the weekly rankings'),
+            ] %}
+            <div class="col-6">
+            <div class="feature-card card-hover">
+                <div class="feature-icon">{{ emoji }}</div>
+                <div class="fw-bold">{{ title }}</div>
+                <div class="text-muted small">{{ desc }}</div>
+            </div>
+            </div>
+            {% endfor %}
+        </div>
+        </div>
     </div>
-</div>
+</section>
+
+<!-- How it works -->
+<section class="mb-5">
+    <h2 class="fw-bold text-center mb-4">How it works</h2>
+    <div class="row g-4 text-center">
+        {% for step, emoji, title, desc in [
+        ('1','🍎','Log your meals','Search from the USDA food database and track your daily nutrition in seconds.'),
+        ('2','⚔️','Complete quests','Daily and weekly challenges keep you on track toward your nutrition goals.'),
+        ('3','🤖','Get AI coaching','Coach Vita gives instant feedback on your meals and generates personalised quests just for you.'),
+        ('4','🏆','Level up','Earn XP, unlock badges, and climb the leaderboard as you build healthier habits.'),
+        ] %}
+        <div class="col-sm-6 col-lg-3">
+        <div class="card border-0 shadow-sm h-100 card-hover p-3">
+            <div style="font-size:2.5rem">{{ emoji }}</div>
+            <div class="fw-bold mt-2 mb-1" style="font-family:var(--font-head);">{{ title }}</div>
+            <div class="text-muted small">{{ desc }}</div>
+        </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="text-center py-5 mb-4 rounded-4" style="background:var(--green-light);">
+    <h2 class="fw-bold mb-2" style="font-family:var(--font-head);">Ready to start your quest?</h2>
+    <p class="text-muted mb-4">Join now and earn your first 50 XP just for setting up your profile.</p>
+    <a href="{{ url_for('auth.register') }}" class="btn btn-success btn-lg">
+        🌱 Create Your Free Account
+    </a>
+</section>
+
 {% endblock %}

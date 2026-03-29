@@ -27,215 +27,220 @@
 {% block content %}
 <div class="row g-4">
 
-  <!-- ── Left: Log form ── -->
-  <div class="col-lg-5">
-    <div class="card border-0 shadow-sm">
-      <div class="card-body p-4">
-        <h4 class="fw-bold mb-1">🍽 Log a Meal</h4>
-        <p class="text-muted small mb-3">Search a food or enter it manually.</p>
+    <!-- ── Left: Log form ── -->
+    <div class="col-lg-5">
+        <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+            <h4 class="fw-bold mb-1">🍽 Log a Meal</h4>
+            <p class="text-muted small mb-3">Search a food or enter it manually.</p>
 
-        <form method="POST" id="logForm">
+            <form method="POST" id="logForm">
 
-          <!-- Food search -->
-          <div class="mb-3 position-relative">
-            <label class="form-label fw-semibold">Food Name</label>
-            <input type="text" id="foodSearch" class="form-control" placeholder="Search food (e.g. banana, chicken breast…)" autocomplete="off">
-            <div id="search-results" class="d-none"></div>
-            <!-- Hidden fields populated by search selection or manual entry -->
-            <input type="hidden" name="food_name"  id="food_name">
-            <input type="hidden" name="brand"       id="brand">
-            <input type="hidden" name="calories"    id="calories">
-            <input type="hidden" name="protein"     id="protein">
-            <input type="hidden" name="carbs"       id="carbs">
-            <input type="hidden" name="fat"         id="fat">
-            <input type="hidden" name="fiber"       id="fiber">
-            <input type="hidden" name="sugar"       id="sugar">
-            <input type="hidden" name="sodium"      id="sodium">
-          </div>
-
-          <!-- Quantity -->
-          <div class="mb-3">
-            <label class="form-label fw-semibold">Quantity (grams)</label>
-            <input type="number" name="quantity_g" id="quantity_g" class="form-control"
-                   value="100" min="1" max="5000" step="1">
-            <div class="form-text">Nutrients are scaled automatically to this amount.</div>
-          </div>
-
-          <!-- Meal type -->
-          <div class="mb-3">
-            <label class="form-label fw-semibold">Meal Type</label>
-            <select name="meal_type" class="form-select">
-              <option value="breakfast">🌅 Breakfast</option>
-              <option value="lunch">☀️ Lunch</option>
-              <option value="dinner" selected>🌙 Dinner</option>
-              <option value="snack">🍎 Snack</option>
-            </select>
-          </div>
-
-          <!-- Food category -->
-          <div class="mb-3">
-            <label class="form-label fw-semibold">Food Category</label>
-            <div class="d-flex flex-wrap gap-2" id="catButtons">
-              {% for val, emoji, label in [
-                ('vegetable','🥦','Vegetable'), ('fruit','🍓','Fruit'),
-                ('protein','🥩','Protein'), ('grain','🌾','Grain'),
-                ('dairy','🥛','Dairy'), ('other','🍽','Other')
-              ] %}
-              <button type="button" class="btn btn-outline-secondary btn-sm cat-btn"
-                      data-val="{{ val }}">{{ emoji }} {{ label }}</button>
-              {% endfor %}
+            <!-- Food search -->
+            <div class="mb-3 position-relative">
+                <label class="form-label fw-semibold">Food Name</label>
+                <input type="text" id="foodSearch" class="form-control" placeholder="Search food (e.g. banana, chicken breast…)" autocomplete="off">
+                <div id="search-results" class="d-none"></div>
+                <!-- Hidden fields populated by search selection or manual entry -->
+                <input type="hidden" name="food_name"  id="food_name">
+                <input type="hidden" name="brand"       id="brand">
+                <input type="hidden" name="calories"    id="calories">
+                <input type="hidden" name="protein"     id="protein">
+                <input type="hidden" name="carbs"       id="carbs">
+                <input type="hidden" name="fat"         id="fat">
+                <input type="hidden" name="fiber"       id="fiber">
+                <input type="hidden" name="sugar"       id="sugar">
+                <input type="hidden" name="sodium"      id="sodium">
             </div>
-            <input type="hidden" name="food_category" id="food_category" value="other">
-          </div>
 
-          <!-- Nutrient preview -->
-          <div id="nutrientPreview" class="mb-3 p-3 bg-light rounded d-none">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-              <span class="fw-semibold small">Nutrient Preview <span class="text-muted">(per logged quantity)</span></span>
-              <button type="button" class="btn btn-link btn-sm p-0 text-muted" id="editManually">Edit manually</button>
+            <!-- Quantity -->
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Quantity (grams)</label>
+                <input type="number" name="quantity_g" id="quantity_g" class="form-control"
+                    value="100" min="1" max="5000" step="1">
+                <div class="form-text">Nutrients are scaled automatically to this amount.</div>
             </div>
-            <div class="d-flex flex-wrap gap-2" id="previewBadges"></div>
-          </div>
 
-          <!-- Manual nutrient entry (hidden by default) -->
-          <div id="manualNutrients" class="mb-3 d-none">
-            <label class="form-label fw-semibold">Nutrients <small class="text-muted">(per 100g)</small></label>
-            <div class="row g-2">
-              {% for field, label, color in [
-                ('calories','Calories (kcal)','danger'),
-                ('protein','Protein (g)','primary'),
-                ('carbs','Carbs (g)','warning'),
-                ('fat','Fat (g)','success'),
-                ('fiber','Fiber (g)','info'),
-                ('sugar','Sugar (g)','warning'),
-                ('sodium','Sodium (mg)','secondary')
-              ] %}
-              <div class="col-6">
-                <label class="form-label small text-muted mb-0">{{ label }}</label>
-                <input type="number" class="form-control form-control-sm manual-field"
-                       data-field="{{ field }}" step="0.1" min="0" placeholder="0">
-              </div>
-              {% endfor %}
+            <!-- Meal type -->
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Meal Type</label>
+                <select name="meal_type" class="form-select">
+                <option value="breakfast">🌅 Breakfast</option>
+                <option value="lunch">☀️ Lunch</option>
+                <option value="dinner" selected>🌙 Dinner</option>
+                <option value="snack">🍎 Snack</option>
+                </select>
             </div>
-          </div>
 
-          <button type="submit" class="btn btn-success w-100 fw-bold">
-            <i class="bi bi-plus-circle"></i> Log Food
-          </button>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <!-- ── Right: Today's log ── -->
-  <div class="col-lg-7">
-
-    <!-- Today's nutrition summary -->
-    <div class="card border-0 shadow-sm mb-4">
-      <div class="card-body p-4">
-        <h5 class="fw-bold mb-3">📊 Today's Nutrition</h5>
-
-        {% set targets = {'calories': 2000, 'protein_g': 50, 'carbs_g': 275, 'fat_g': 78, 'fiber_g': 28} %}
-
-        <div class="row text-center g-3 mb-3">
-          {% for label, key, unit, color in [
-            ('Calories', 'calories', 'kcal', 'danger'),
-            ('Protein',  'protein_g', 'g', 'primary'),
-            ('Carbs',    'carbs_g', 'g', 'warning'),
-            ('Fat',      'fat_g', 'g', 'success'),
-            ('Fiber',    'fiber_g', 'g', 'info'),
-          ] %}
-          <div class="col">
-            <div class="fw-bold text-{{ color }} fs-5">
-              {{ today_totals[key]|round(1) }}
-              <small class="text-muted fs-6">{{ unit }}</small>
+            <!-- Food category -->
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Food Category</label>
+                <div class="d-flex flex-wrap gap-2" id="catButtons">
+                {% for val, emoji, label in [
+                    ('vegetable','🥦','Vegetable'), ('fruit','🍓','Fruit'),
+                    ('protein','🥩','Protein'), ('grain','🌾','Grain'),
+                    ('dairy','🥛','Dairy'), ('other','🍽','Other')
+                ] %}
+                <button type="button" class="btn btn-outline-secondary btn-sm cat-btn"
+                        data-val="{{ val }}">{{ emoji }} {{ label }}</button>
+                {% endfor %}
+                </div>
+                <input type="hidden" name="food_category" id="food_category" value="other">
             </div>
-            <div class="nutrient-bar-label">{{ label }}</div>
-            <div class="progress progress-sm">
-              <div class="progress-bar bg-{{ color }}"
-                   style="width:{{ [((today_totals[key] / targets[key]) * 100)|int, 100]|min }}%">
-              </div>
+
+            <!-- Nutrient preview -->
+            <div id="nutrientPreview" class="mb-3 p-3 bg-light rounded d-none">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="fw-semibold small">Nutrient Preview <span class="text-muted">(per logged quantity)</span></span>
+                <button type="button" class="btn btn-link btn-sm p-0 text-muted" id="editManually">Edit manually</button>
+                </div>
+                <div class="d-flex flex-wrap gap-2" id="previewBadges"></div>
             </div>
-            <div class="text-muted" style="font-size:.65rem">
-              / {{ targets[key] }}{{ unit }}
+
+            <!-- Manual nutrient entry (hidden by default) -->
+            <div id="manualNutrients" class="mb-3 d-none">
+                <label class="form-label fw-semibold">Nutrients <small class="text-muted">(per 100g)</small></label>
+                <div class="row g-2">
+                {% for field, label, color in [
+                    ('calories','Calories (kcal)','danger'),
+                    ('protein','Protein (g)','primary'),
+                    ('carbs','Carbs (g)','warning'),
+                    ('fat','Fat (g)','success'),
+                    ('fiber','Fiber (g)','info'),
+                    ('sugar','Sugar (g)','warning'),
+                    ('sodium','Sodium (mg)','secondary')
+                ] %}
+                <div class="col-6">
+                    <label class="form-label small text-muted mb-0">{{ label }}</label>
+                    <input type="number" class="form-control form-control-sm manual-field"
+                        data-field="{{ field }}" step="0.1" min="0" placeholder="0">
+                </div>
+                {% endfor %}
+                </div>
             </div>
-          </div>
-          {% endfor %}
+
+            <button type="submit" class="btn btn-success w-100 fw-bold">
+                <i class="bi bi-plus-circle"></i> Log Food
+            </button>
+            </form>
         </div>
-
-        {% if today_totals.meal_count == 0 %}
-        <p class="text-muted text-center mb-0 small">No meals logged today yet!</p>
-        {% else %}
-        <p class="text-muted text-center mb-0 small">
-          {{ today_totals.meal_count }} meal{{ 's' if today_totals.meal_count != 1 }} logged today
-        </p>
-        {% endif %}
-      </div>
+        </div>
     </div>
 
-    <!-- Today's meal list -->
-    <div class="card border-0 shadow-sm">
-      <div class="card-body p-4">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <h5 class="fw-bold mb-0">🗒 Today's Meals</h5>
-          <a href="{{ url_for('food_log.history') }}" class="btn btn-sm btn-outline-secondary">
-            <i class="bi bi-clock-history"></i> History
-          </a>
-        </div>
+    <!-- ── Right: Today's log ── -->
+    <div class="col-lg-7">
 
-        {% if today_logs %}
-        <div class="d-flex flex-column gap-2">
-          {% for log in today_logs %}
-          <div class="meal-row p-3 border rounded">
-            <div class="d-flex justify-content-between align-items-start">
-              <div>
-                <div class="fw-semibold">
-                  {% if log.food_category == 'vegetable' %}🥦
-                  {% elif log.food_category == 'fruit' %}🍓
-                  {% elif log.food_category == 'protein' %}🥩
-                  {% elif log.food_category == 'grain' %}🌾
-                  {% elif log.food_category == 'dairy' %}🥛
-                  {% else %}🍽{% endif %}
-                  {{ log.food_name }}
+        <!-- Today's nutrition summary -->
+        <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-4">
+            <h5 class="fw-bold mb-3">📊 Today's Nutrition</h5>
+
+            {% set targets = {'calories': 2000, 'protein_g': 50, 'carbs_g': 275, 'fat_g': 78, 'fiber_g': 28} %}
+
+            <div class="row text-center g-3 mb-3">
+            {% for label, key, unit, color in [
+                ('Calories', 'calories', 'kcal', 'danger'),
+                ('Protein',  'protein_g', 'g', 'primary'),
+                ('Carbs',    'carbs_g', 'g', 'warning'),
+                ('Fat',      'fat_g', 'g', 'success'),
+                ('Fiber',    'fiber_g', 'g', 'info'),
+            ] %}
+            <div class="col">
+                <div class="fw-bold text-{{ color }} fs-5">
+                {{ today_totals[key]|round(1) }}
+                <small class="text-muted fs-6">{{ unit }}</small>
                 </div>
-                <div class="text-muted small">
-                  {{ log.meal_type|title if log.meal_type else '—' }} ·
-                  {{ log.quantity_g|int }}g
-                  {% if log.brand %} · {{ log.brand }}{% endif %}
+                <div class="nutrient-bar-label">{{ label }}</div>
+                <div class="progress progress-sm">
+                <div class="progress-bar bg-{{ color }}"
+                    style="width:{{ [((today_totals[key] / targets[key]) * 100)|int, 100]|min }}%">
                 </div>
-                <div class="d-flex flex-wrap gap-1 mt-1">
-                  <span class="badge bg-danger bg-opacity-10 text-danger macro-badge">{{ log.calories|int }} kcal</span>
-                  <span class="badge bg-primary bg-opacity-10 text-primary macro-badge">P: {{ log.protein_g|round(1) }}g</span>
-                  <span class="badge bg-warning bg-opacity-10 text-warning macro-badge">C: {{ log.carbs_g|round(1) }}g</span>
-                  <span class="badge bg-success bg-opacity-10 text-success macro-badge">F: {{ log.fat_g|round(1) }}g</span>
-                  {% if log.fiber_g > 0 %}
-                  <span class="badge bg-info bg-opacity-10 text-info macro-badge">Fi: {{ log.fiber_g|round(1) }}g</span>
-                  {% endif %}
                 </div>
-              </div>
-              <div class="d-flex flex-column align-items-end gap-1">
-                <span class="badge bg-warning text-dark" style="font-size:.7rem">+{{ log.xp_awarded }} XP</span>
-                <form action="{{ url_for('food_log.delete', log_id=log.id) }}" method="POST">
-                  <button class="btn btn-outline-danger btn-sm" style="font-size:.7rem; padding:.2rem .5rem;"
-                          onclick="return confirm('Remove this entry?')">
-                    <i class="bi bi-trash"></i>
-                  </button>
-                </form>
-              </div>
+                <div class="text-muted" style="font-size:.65rem">
+                / {{ targets[key] }}{{ unit }}
+                </div>
             </div>
-          </div>
-          {% endfor %}
-        </div>
-        {% else %}
-        <div class="text-center py-4 text-muted">
-          <div style="font-size:3rem">🍽</div>
-          <p class="mt-2">Nothing logged yet today.<br>Search for a food above to get started!</p>
-        </div>
-        {% endif %}
-      </div>
-    </div>
+            {% endfor %}
+            </div>
 
-  </div>
+            {% if today_totals.meal_count == 0 %}
+            <p class="text-muted text-center mb-0 small">No meals logged today yet!</p>
+            {% else %}
+            <p class="text-muted text-center mb-0 small">
+            {{ today_totals.meal_count }} meal{{ 's' if today_totals.meal_count != 1 }} logged today
+            </p>
+            {% endif %}
+        </div>
+        </div>
+
+        <!-- Today's meal list -->
+        <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold mb-0">🗒 Today's Meals</h5>
+            <a href="{{ url_for('food_log.history') }}" class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-clock-history"></i> History
+            </a>
+            </div>
+
+            {% if today_logs %}
+            <div class="d-flex flex-column gap-2">
+            {% for log in today_logs %}
+            <div class="meal-row p-3 border rounded">
+                <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="fw-semibold">
+                    {% if log.food_category == 'vegetable' %}🥦
+                    {% elif log.food_category == 'fruit' %}🍓
+                    {% elif log.food_category == 'protein' %}🥩
+                    {% elif log.food_category == 'grain' %}🌾
+                    {% elif log.food_category == 'dairy' %}🥛
+                    {% else %}🍽{% endif %}
+                    {{ log.food_name }}
+                    </div>
+                    <div class="text-muted small">
+                    {{ log.meal_type|title if log.meal_type else '—' }} ·
+                    {{ log.quantity_g|int }}g
+                    {% if log.brand %} · {{ log.brand }}{% endif %}
+                    </div>
+                    <div class="d-flex flex-wrap gap-1 mt-1">
+                    <span class="badge bg-danger bg-opacity-10 text-danger macro-badge">{{ log.calories|int }} kcal</span>
+                    <span class="badge bg-primary bg-opacity-10 text-primary macro-badge">P: {{ log.protein_g|round(1) }}g</span>
+                    <span class="badge bg-warning bg-opacity-10 text-warning macro-badge">C: {{ log.carbs_g|round(1) }}g</span>
+                    <span class="badge bg-success bg-opacity-10 text-success macro-badge">F: {{ log.fat_g|round(1) }}g</span>
+                    {% if log.fiber_g > 0 %}
+                    <span class="badge bg-info bg-opacity-10 text-info macro-badge">Fi: {{ log.fiber_g|round(1) }}g</span>
+                    {% endif %}
+                    </div>
+                    {% if log.ai_feedback %}
+                    <div class="mt-2 p-2 rounded" style="background:rgba(45,158,95,.08); font-size:.82rem; color:#2d6a4f; border-left:3px solid #2d9e5f;">
+                    🤖 <em>{{ log.ai_feedback }}</em>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="d-flex flex-column align-items-end gap-1">
+                    <span class="badge bg-warning text-dark" style="font-size:.7rem">+{{ log.xp_awarded }} XP</span>
+                    <form action="{{ url_for('food_log.delete', log_id=log.id) }}" method="POST">
+                    <button class="btn btn-outline-danger btn-sm" style="font-size:.7rem; padding:.2rem .5rem;"
+                            onclick="return confirm('Remove this entry?')">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                    </form>
+                </div>
+                </div>
+            </div>
+            {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-4 text-muted">
+            <div style="font-size:3rem">🍽</div>
+            <p class="mt-2">Nothing logged yet today.<br>Search for a food above to get started!</p>
+            </div>
+            {% endif %}
+        </div>
+        </div>
+
+    </div>
 </div>
 {% endblock %}
 
@@ -243,11 +248,11 @@
 <script>
 // ── Category buttons ──────────────────────────────────────────────────────
 document.querySelectorAll('.cat-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    document.getElementById('food_category').value = btn.dataset.val;
-  });
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('food_category').value = btn.dataset.val;
+    });
 });
 // Default active
 document.querySelector('.cat-btn[data-val="other"]').classList.add('active');
@@ -265,122 +270,122 @@ const quantityInput = document.getElementById('quantity_g');
 let per100 = {};
 
 searchInput.addEventListener('input', () => {
-  clearTimeout(searchTimeout);
-  const q = searchInput.value.trim();
-  if (q.length < 2) { resultsBox.classList.add('d-none'); return; }
-  searchTimeout = setTimeout(() => fetchResults(q), 350);
+    clearTimeout(searchTimeout);
+    const q = searchInput.value.trim();
+    if (q.length < 2) { resultsBox.classList.add('d-none'); return; }
+    searchTimeout = setTimeout(() => fetchResults(q), 350);
 });
 
 async function fetchResults(q) {
-  resultsBox.innerHTML = '<div class="p-2 text-muted small">Searching…</div>';
-  resultsBox.classList.remove('d-none');
-  const res = await fetch(`/log/search?q=${encodeURIComponent(q)}`);
-  const foods = await res.json();
-  if (!foods.length) {
-    resultsBox.innerHTML = '<div class="p-2 text-muted small">No results — try entering nutrients manually below.</div>';
-    return;
-  }
-  resultsBox.innerHTML = foods.map((f, i) => `
-    <div class="search-result-item" data-idx="${i}">
-      <div class="fw-semibold small">${f.name}</div>
-      <div class="text-muted" style="font-size:.75rem">
-        ${f.brand ? f.brand + ' · ' : ''}
-        ${f.calories} kcal · P:${f.protein}g · C:${f.carbs}g · F:${f.fat}g
-        <small>(per 100g)</small>
-      </div>
-    </div>
-  `).join('');
+    resultsBox.innerHTML = '<div class="p-2 text-muted small">Searching…</div>';
+    resultsBox.classList.remove('d-none');
+    const res = await fetch(`/log/search?q=${encodeURIComponent(q)}`);
+    const foods = await res.json();
+    if (!foods.length) {
+        resultsBox.innerHTML = '<div class="p-2 text-muted small">No results — try entering nutrients manually below.</div>';
+        return;
+    }
+    resultsBox.innerHTML = foods.map((f, i) => `
+        <div class="search-result-item" data-idx="${i}">
+        <div class="fw-semibold small">${f.name}</div>
+        <div class="text-muted" style="font-size:.75rem">
+            ${f.brand ? f.brand + ' · ' : ''}
+            ${f.calories} kcal · P:${f.protein}g · C:${f.carbs}g · F:${f.fat}g
+            <small>(per 100g)</small>
+        </div>
+        </div>
+    `).join('');
 
-  // Store results for selection
-  window._searchResults = foods;
-  resultsBox.querySelectorAll('.search-result-item').forEach(el => {
-    el.addEventListener('click', () => selectFood(window._searchResults[+el.dataset.idx]));
-  });
+    // Store results for selection
+    window._searchResults = foods;
+    resultsBox.querySelectorAll('.search-result-item').forEach(el => {
+        el.addEventListener('click', () => selectFood(window._searchResults[+el.dataset.idx]));
+    });
 }
 
 function selectFood(food) {
-  searchInput.value = food.name;
-  resultsBox.classList.add('d-none');
+    searchInput.value = food.name;
+    resultsBox.classList.add('d-none');
 
-  // Store per-100g values
-  per100 = { calories: food.calories, protein: food.protein, carbs: food.carbs,
-              fat: food.fat, fiber: food.fiber, sugar: food.sugar, sodium: food.sodium };
+    // Store per-100g values
+    per100 = { calories: food.calories, protein: food.protein, carbs: food.carbs,
+                fat: food.fat, fiber: food.fiber, sugar: food.sugar, sodium: food.sodium };
 
-  document.getElementById('food_name').value = food.name;
-  document.getElementById('brand').value     = food.brand;
+    document.getElementById('food_name').value = food.name;
+    document.getElementById('brand').value     = food.brand;
 
-  updateNutrients();
-  preview.classList.remove('d-none');
-  manualDiv.classList.add('d-none');
+    updateNutrients();
+    preview.classList.remove('d-none');
+    manualDiv.classList.add('d-none');
 }
 
 function updateNutrients() {
-  const qty   = parseFloat(quantityInput.value) || 100;
-  const scale = qty / 100;
+    const qty   = parseFloat(quantityInput.value) || 100;
+    const scale = qty / 100;
 
-  const scaled = {};
-  for (const [k, v] of Object.entries(per100)) {
-    scaled[k] = Math.round(v * scale * 10) / 10;
-  }
+    const scaled = {};
+    for (const [k, v] of Object.entries(per100)) {
+        scaled[k] = Math.round(v * scale * 10) / 10;
+    }
 
-  document.getElementById('calories').value = scaled.calories || 0;
-  document.getElementById('protein').value  = scaled.protein  || 0;
-  document.getElementById('carbs').value    = scaled.carbs    || 0;
-  document.getElementById('fat').value      = scaled.fat      || 0;
-  document.getElementById('fiber').value    = scaled.fiber    || 0;
-  document.getElementById('sugar').value    = scaled.sugar    || 0;
-  document.getElementById('sodium').value   = scaled.sodium   || 0;
+    document.getElementById('calories').value = scaled.calories || 0;
+    document.getElementById('protein').value  = scaled.protein  || 0;
+    document.getElementById('carbs').value    = scaled.carbs    || 0;
+    document.getElementById('fat').value      = scaled.fat      || 0;
+    document.getElementById('fiber').value    = scaled.fiber    || 0;
+    document.getElementById('sugar').value    = scaled.sugar    || 0;
+    document.getElementById('sodium').value   = scaled.sodium   || 0;
 
-  previewBadges.innerHTML = `
-    <span class="badge bg-danger bg-opacity-10 text-danger macro-badge">${scaled.calories||0} kcal</span>
-    <span class="badge bg-primary bg-opacity-10 text-primary macro-badge">P: ${scaled.protein||0}g</span>
-    <span class="badge bg-warning bg-opacity-10 text-warning macro-badge">C: ${scaled.carbs||0}g</span>
-    <span class="badge bg-success bg-opacity-10 text-success macro-badge">F: ${scaled.fat||0}g</span>
-    <span class="badge bg-info bg-opacity-10 text-info macro-badge">Fi: ${scaled.fiber||0}g</span>
-  `;
+    previewBadges.innerHTML = `
+        <span class="badge bg-danger bg-opacity-10 text-danger macro-badge">${scaled.calories||0} kcal</span>
+        <span class="badge bg-primary bg-opacity-10 text-primary macro-badge">P: ${scaled.protein||0}g</span>
+        <span class="badge bg-warning bg-opacity-10 text-warning macro-badge">C: ${scaled.carbs||0}g</span>
+        <span class="badge bg-success bg-opacity-10 text-success macro-badge">F: ${scaled.fat||0}g</span>
+        <span class="badge bg-info bg-opacity-10 text-info macro-badge">Fi: ${scaled.fiber||0}g</span>
+    `;
 }
 
 // Re-scale on quantity change
 quantityInput.addEventListener('input', () => {
-  if (Object.keys(per100).length) updateNutrients();
+    if (Object.keys(per100).length) updateNutrients();
 });
 
 // Manual edit toggle
 document.getElementById('editManually').addEventListener('click', () => {
-  manualDiv.classList.remove('d-none');
-  // Pre-fill manual fields from per100
-  manualDiv.querySelectorAll('.manual-field').forEach(inp => {
-    inp.value = per100[inp.dataset.field] || '';
-  });
+    manualDiv.classList.remove('d-none');
+    // Pre-fill manual fields from per100
+    manualDiv.querySelectorAll('.manual-field').forEach(inp => {
+        inp.value = per100[inp.dataset.field] || '';
+    });
 });
 
 // Sync manual fields → hidden inputs
 manualDiv.addEventListener('input', e => {
-  if (e.target.classList.contains('manual-field')) {
-    const field = e.target.dataset.field;
-    per100[field] = parseFloat(e.target.value) || 0;
-    document.getElementById(field).value = per100[field];
-    // Also update food_name if not set
-    if (!document.getElementById('food_name').value) {
-      document.getElementById('food_name').value = searchInput.value;
+    if (e.target.classList.contains('manual-field')) {
+        const field = e.target.dataset.field;
+        per100[field] = parseFloat(e.target.value) || 0;
+        document.getElementById(field).value = per100[field];
+        // Also update food_name if not set
+        if (!document.getElementById('food_name').value) {
+        document.getElementById('food_name').value = searchInput.value;
+        }
     }
-  }
 });
 
 // Form validation
 document.getElementById('logForm').addEventListener('submit', e => {
-  const name = searchInput.value.trim();
-  if (!name) { e.preventDefault(); alert('Please enter a food name.'); return; }
-  if (!document.getElementById('food_name').value) {
-    document.getElementById('food_name').value = name;
-  }
+    const name = searchInput.value.trim();
+    if (!name) { e.preventDefault(); alert('Please enter a food name.'); return; }
+    if (!document.getElementById('food_name').value) {
+        document.getElementById('food_name').value = name;
+    }
 });
 
 // Close search results on outside click
 document.addEventListener('click', e => {
-  if (!e.target.closest('#foodSearch') && !e.target.closest('#search-results')) {
-    resultsBox.classList.add('d-none');
-  }
+    if (!e.target.closest('#foodSearch') && !e.target.closest('#search-results')) {
+        resultsBox.classList.add('d-none');
+    }
 });
 </script>
 {% endblock %}

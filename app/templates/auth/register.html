@@ -1,34 +1,94 @@
 {% extends 'base.html' %}
-{% block title %}Register | Healthy Plate Quest{% endblock %}
+{% block title %}Setup Your Profile | Healthy Plate Quest{% endblock %}
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-5">
-        <div class="card shadow-sm border-0">
-            <div class="card-body p-4">
-                <h2 class="text-center mb-4">🌱 Create Account</h2>
-                <form method="POST">
-                    <div class="mb-3">
-                        <label class="form-label">Username</label>
-                        <input type="text" name="username" class="form-control" required autofocus minlength="3">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Email</label>
-                        <input type="email" name="email" class="form-control" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Password</label>
-                        <input type="password" name="password" class="form-control" required minlength="6">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Confirm Password</label>
-                        <input type="password" name="confirm_password" class="form-control" required>
-                    </div>
-                    <button type="submit" class="btn btn-success w-100">Create Account</button>
-                </form>
-                <hr>
-                <p class="text-center mb-0">Already have an account? <a href="{{ url_for('auth.login') }}">Log in</a></p>
-            </div>
+<div class="row justify-content-center mt-2">
+    <div class="col-sm-10 col-md-8 col-lg-6">
+
+        <div class="text-center mb-4">
+        <div style="font-size:3rem">🎯</div>
+        <h2 class="fw-bold mt-2 mb-0">Personalise your quest!</h2>
+        <p class="text-muted">Help us tailor challenges and AI coaching just for you.</p>
         </div>
+
+        <!-- Progress indicator -->
+        <div class="d-flex justify-content-center gap-2 mb-4">
+        <span class="badge rounded-pill bg-success px-3 py-2">✓ Account</span>
+        <span class="badge rounded-pill bg-success px-3 py-2">→ Profile</span>
+        <span class="badge rounded-pill bg-light text-muted px-3 py-2">Dashboard</span>
+        </div>
+
+        <div class="card border-0 shadow">
+        <div class="card-body p-4">
+            <form method="POST">
+
+            <div class="row mb-3">
+                <div class="col-sm-5">
+                <label class="form-label">Your Age</label>
+                <input type="number" name="age" class="form-control"
+                        min="10" max="120" placeholder="e.g. 21">
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Primary Nutrition Goal</label>
+                <div class="row g-2" id="goalButtons">
+                {% for val, emoji, label in [
+                    ('general','🥗','General Healthy Eating'),
+                    ('energy','⚡','More Energy & Focus'),
+                    ('weight_management','⚖️','Weight Management'),
+                    ('gut_health','🌿','Gut Health'),
+                    ('muscle_building','💪','Muscle Building'),
+                ] %}
+                <div class="col-6 col-sm-4">
+                    <input type="radio" class="btn-check" name="nutrition_goal"
+                        id="goal_{{ val }}" value="{{ val }}"
+                        {{ 'checked' if loop.first }}>
+                    <label class="btn btn-outline-success w-100 text-start p-2"
+                        for="goal_{{ val }}" style="font-size:.85rem;">
+                    {{ emoji }} {{ label }}
+                    </label>
+                </div>
+                {% endfor %}
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Dietary Preference</label>
+                <select name="dietary_preference" class="form-select">
+                <option value="omnivore">🍖 Omnivore</option>
+                <option value="vegetarian">🥕 Vegetarian</option>
+                <option value="vegan">🌱 Vegan</option>
+                <option value="pescatarian">🐟 Pescatarian</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">
+                Dietary Restrictions
+                <span class="text-muted fw-normal">(optional)</span>
+                </label>
+                <input type="text" name="dietary_restrictions" class="form-control"
+                    placeholder="e.g. gluten, lactose, nuts">
+                <div class="form-text">Coach Vita will always respect these.</div>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label">
+                Favourite Ingredients
+                <span class="text-muted fw-normal">(optional)</span>
+                </label>
+                <input type="text" name="favorite_ingredients" class="form-control"
+                    placeholder="e.g. chicken, pasta, broccoli, avocado">
+                <div class="form-text">Used to personalise quests and meal suggestions.</div>
+            </div>
+
+            <button type="submit" class="btn btn-success w-100 btn-lg">
+                Begin My Quest 🚀 <span class="badge bg-warning text-dark ms-1">+50 XP</span>
+            </button>
+            </form>
+        </div>
+        </div>
+
     </div>
 </div>
 {% endblock %}

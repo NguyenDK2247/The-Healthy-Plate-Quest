@@ -11,11 +11,19 @@ from app.services.gamification import (
 
 food_log_bp = Blueprint('food_log', __name__)
 
+# Lazy import to avoid circular imports
+def _get_meal_feedback(user, log):
+    try:
+        from app.services.ai_coach import generate_meal_feedback
+        return generate_meal_feedback(user, log)
+    except Exception:
+        return None
+
 
 # ─── USDA FoodData Central search ───────────────────────────────────────────
 import requests
 
-USDA_API_KEY = 'FcjpycpiZSCaYOHivFV2C7fb8clKcPKAekYvHAHm' 
+USDA_API_KEY = 'FcjpycpiZSCaYOHivFV2C7fb8clKcPKAekYvHAHm'
 
 def search_usda(query, max_results=8):
     """Search USDA FoodData Central and return simplified results."""
@@ -81,20 +89,6 @@ def process_food_log_rewards(user, log):
     Returns flash messages.
     """
     all_quest_results = []
-
-    if user.total_meals_logged is None:
-        user.total_meals_logged = 0
-    if user.total_quests_completed is None:
-        user.total_quests_completed = 0
-    if user.xp_points is None:
-        user.xp_points = 0
-    if user.level is None:
-        user.level = 1
-    if user.current_streak is None:
-        user.current_streak = 0
-    if user.longest_streak is None:
-        user.longest_streak = 0
-    db.session.commit()
 
     # Base XP for logging
     xp_amount = XP_EVENTS['log_meal']
@@ -176,21 +170,21 @@ def index():
         scale = quantity_g / 100.0
 
         log = FoodLog(
-            user_id       = current_user.id,
-            food_name     = food_name,
-            brand         = request.form.get('brand', ''),
-            meal_type     = meal_type,
-            quantity_g    = quantity_g,
+            user_id      = current_user.id,
+            food_name    = food_name,
+            brand        = request.form.get('brand', ''),
+            meal_type    = meal_type,
+            quantity_g   = quantity_g,
             food_category = food_category,
-            color_group   = CATEGORY_COLOR_MAP.get(food_category, 'other'),
+            color_group  = CATEGORY_COLOR_MAP.get(food_category, 'other'),
             is_plant_based = food_category in ('vegetable', 'fruit', 'grain'),
-            calories      = round(float(request.form.get('calories') or 0) * scale, 1),
-            protein_g     = round(float(request.form.get('protein') or 0) * scale, 1),
-            carbs_g       = round(float(request.form.get('carbs') or 0) * scale, 1),
-            fat_g         = round(float(request.form.get('fat') or 0) * scale, 1),
-            fiber_g       = round(float(request.form.get('fiber') or 0) * scale, 1),
-            sugar_g       = round(float(request.form.get('sugar') or 0) * scale, 1),
-            sodium_mg     = round(float(request.form.get('sodium') or 0) * scale, 1),
+            calories     = round(float(request.form.get('calories') or 0) * scale, 1),
+            protein_g    = round(float(request.form.get('protein') or 0) * scale, 1),
+            carbs_g      = round(float(request.form.get('carbs') or 0) * scale, 1),
+            fat_g        = round(float(request.form.get('fat') or 0) * scale, 1),
+            fiber_g      = round(float(request.form.get('fiber') or 0) * scale, 1),
+            sugar_g      = round(float(request.form.get('sugar') or 0) * scale, 1),
+            sodium_mg    = round(float(request.form.get('sodium') or 0) * scale, 1),
         )
         db.session.add(log)
         db.session.commit()
@@ -201,6 +195,15 @@ def index():
             flash(msg, cat)
 
         flash(f'✅ {food_name} logged successfully!', 'success')
+
+        # Generate AI meal feedback (non-blocking — skip if API unavailable)
+        feedback = _get_meal_feedback(current_user, log)
+        if feedback:
+            log.ai_feedback = feedback
+            from datetime import datetime
+            log.ai_feedback_generated_at = datetime.utcnow()
+            db.session.commit()
+
         return redirect(url_for('food_log.index'))
 
     # GET — show today's logs

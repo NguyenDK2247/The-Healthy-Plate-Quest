@@ -381,3 +381,38 @@ def build_reward_summary(xp_result=None, streak_result=None, quest_results=None)
             f"{badge.icon} New badge unlocked: <strong>{badge.name}</strong>!"))
 
     return messages
+
+
+# ─────────────────────────────────────────────
+#  STREAK PROTECTION (Phase 6)
+# ─────────────────────────────────────────────
+
+def check_streak_protection(user):
+    """
+    Called on dashboard load. If the user missed exactly ONE day,
+    offer a streak shield (costs 50 XP) to protect their streak.
+    Returns True if the streak was broken by exactly one missed day.
+    """
+    from datetime import date
+    today = date.today()
+    if user.last_log_date is None:
+        return False
+    days_missed = (today - user.last_log_date).days
+    return days_missed == 2   # missed exactly yesterday
+
+
+def apply_streak_shield(user):
+    """
+    Spend 50 XP to repair a 1-day streak break.
+    Returns True if successful, False if not enough XP.
+    """
+    SHIELD_COST = 50
+    if (user.xp_points or 0) < SHIELD_COST:
+        return False
+
+    from datetime import date, timedelta
+    user.xp_points -= SHIELD_COST
+    # Reset last_log_date to yesterday so streak resumes from today
+    user.last_log_date = date.today() - timedelta(days=1)
+    db.session.commit()
+    return True

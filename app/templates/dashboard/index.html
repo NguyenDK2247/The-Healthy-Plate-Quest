@@ -3,187 +3,319 @@
 
 {% block extra_css %}
 <style>
-  .xp-bar-wrap { height:14px; border-radius:20px; overflow:hidden; background:#e9ecef; }
-  .xp-bar { height:100%; border-radius:20px;
-             background:linear-gradient(90deg,#ffc107,#fd7e14); transition:width .6s ease; }
-  [data-theme="dark"] .xp-bar-wrap { background:#333; }
-  .quick-stat { border-radius:14px; text-align:center; padding:1rem; }
-  .quest-mini { border-radius:12px; border-left:4px solid #28a745; }
-  .quest-mini.medium { border-left-color:#fd7e14; }
-  .quest-mini.hard   { border-left-color:#dc3545; }
-  .nutrient-bar-label { font-size:.72rem; color:#6c757d; margin-bottom:2px; }
   .progress-sm { height:7px; border-radius:20px; }
-  .meal-chip { font-size:.75rem; padding:.25rem .6rem; border-radius:8px; }
+  .meal-chip   { font-size:.75rem; padding:.25rem .6rem; border-radius:8px; }
+  .quest-accent { border-left:4px solid #28a745; border-radius:0 var(--radius) var(--radius) 0; }
+  .quest-accent.medium { border-left-color:var(--orange); }
+  .quest-accent.hard   { border-left-color:#dc3545; }
+  .nutrient-col .val { font-size:1.2rem; font-weight:800; font-family:'Nunito',sans-serif; line-height:1; }
+  .nutrient-col .lbl { font-size:.65rem; text-transform:uppercase; letter-spacing:.06em; color:var(--text-muted); margin:.2rem 0; }
+
+  /* Nudge cards */
+  .nudge-card { border-radius:12px; border:none; }
+  .nudge-loss   { background:linear-gradient(135deg,#fff3cd,#ffe8a1); border-left:4px solid #fd7e14; }
+  .nudge-streak { background:linear-gradient(135deg,#d4edda,#b8f0c8); border-left:4px solid #28a745; }
+  .nudge-tip    { background:linear-gradient(135deg,#d1ecf1,#b8e4ed); border-left:4px solid #17a2b8; }
+  .nudge-reward { background:linear-gradient(135deg,#f8d7da,#f5c1c8); border-left:4px solid #dc3545; }
+  .nudge-social { background:linear-gradient(135deg,#e2d9f3,#d0c4ec); border-left:4px solid #6f42c1; }
+  [data-theme="dark"] .nudge-loss   { background:rgba(253,126,20,.12); }
+  [data-theme="dark"] .nudge-streak { background:rgba(40,167,69,.12); }
+  [data-theme="dark"] .nudge-tip    { background:rgba(23,162,184,.12); }
+  [data-theme="dark"] .nudge-reward { background:rgba(220,53,69,.12); }
+  [data-theme="dark"] .nudge-social { background:rgba(111,66,193,.12); }
+
+  /* Activity grid */
+  .activity-dot {
+    width:28px; height:28px; border-radius:6px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:.6rem; font-weight:700; transition:transform .1s;
+  }
+  .activity-dot:hover { transform:scale(1.15); }
+  .activity-dot.logged   { background:var(--green); color:#fff; }
+  .activity-dot.unlogged { background:#e9ecef; color:var(--text-muted); }
+  [data-theme="dark"] .activity-dot.unlogged { background:#2e3240; }
+
+  .stat-box { border-radius:10px; text-align:center; padding:.85rem .5rem; background:var(--bg-light,#f8f9fa); }
+  [data-theme="dark"] .stat-box { background:#252830; }
+  .stat-value { font-size:1.4rem; font-weight:800; font-family:'Nunito',sans-serif; line-height:1; }
+  .stat-label { font-size:.62rem; text-transform:uppercase; letter-spacing:.06em; color:var(--text-muted); margin-top:.2rem; }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="row g-4">
-
-  <!-- ── Player card ── -->
-  <div class="col-md-4 col-lg-3">
-    <div class="card border-0 shadow-sm h-100">
-      <div class="card-body text-center p-4">
-        <div class="rounded-circle bg-success text-white d-flex align-items-center
-                    justify-content-center fw-bold mx-auto mb-3"
-             style="width:72px;height:72px;font-size:1.8rem;">
-          {{ current_user.display_name[0]|upper }}
+    <!-- Streak shield offer -->
+    {% if streak_shield_available %}
+    <div class="alert alert-warning d-flex align-items-center gap-3 mb-4 fade-in-up" style="border-left:4px solid #fd7e14;">
+        <span style="font-size:1.8rem;">🛡️</span>
+        <div class="flex-grow-1">
+            <strong>Streak shield available!</strong>
+            <div class="small">You missed yesterday — spend <strong>50 XP</strong> to restore your
+            {{ current_user.current_streak }}-day streak before it resets.</div>
         </div>
-        <h5 class="fw-bold mb-0">{{ current_user.display_name }}</h5>
-        <div class="text-muted small mb-2">{{ current_user.level_title }}</div>
-        <span class="badge bg-success mb-3">Level {{ current_user.level }}</span>
-
-        <div class="xp-bar-wrap mb-1">
-          <div class="xp-bar" style="width:{{ current_user.xp_progress_percent() }}%"></div>
-        </div>
-        <div class="d-flex justify-content-between" style="font-size:.75rem;color:#6c757d;">
-          <span>{{ current_user.xp_points }} XP</span>
-          <span>+{{ current_user.xp_for_next_level() }} to next</span>
-        </div>
-
-        <hr class="my-3">
-        <div class="row g-2">
-          <div class="col-4">
-            <div class="quick-stat bg-light">
-              <div class="fw-bold text-danger">{{ current_user.current_streak }}</div>
-              <div style="font-size:.65rem;color:#6c757d;">🔥 Streak</div>
-            </div>
-          </div>
-          <div class="col-4">
-            <div class="quick-stat bg-light">
-              <div class="fw-bold text-primary">{{ current_user.total_meals_logged }}</div>
-              <div style="font-size:.65rem;color:#6c757d;">🍽 Meals</div>
-            </div>
-          </div>
-          <div class="col-4">
-            <div class="quick-stat bg-light">
-              <div class="fw-bold text-success">{{ current_user.total_quests_completed }}</div>
-              <div style="font-size:.65rem;color:#6c757d;">⚔️ Quests</div>
-            </div>
-          </div>
-        </div>
-
-        {% if my_rank %}
-        <div class="mt-3 p-2 rounded" style="background:rgba(255,193,7,.1)">
-          <div class="fw-bold text-warning">
-            {% if my_rank == 1 %}🥇{% elif my_rank == 2 %}🥈{% elif my_rank == 3 %}🥉
-            {% else %}#{{ my_rank }}{% endif %} Weekly Rank
-          </div>
-          <div style="font-size:.75rem;color:#6c757d;">
-            {{ my_entry.xp_this_week if my_entry else 0 }} XP this week
-          </div>
-        </div>
-        {% endif %}
-      </div>
+        <form action="{{ url_for('dashboard.streak_shield') }}" method="POST" class="ms-2">
+            <button class="btn btn-warning btn-sm fw-bold" style="white-space:nowrap;">
+            Use Shield (50 XP)
+            </button>
+        </form>
     </div>
-  </div>
+    {% endif %}
 
-  <!-- ── Main content ── -->
-  <div class="col-md-8 col-lg-9">
 
-    <!-- Today's nutrition -->
-    <div class="card border-0 shadow-sm mb-4">
-      <div class="card-body p-4">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <h5 class="fw-bold mb-0">📊 Today's Nutrition</h5>
-          <a href="{{ url_for('food_log.index') }}" class="btn btn-sm btn-success">
-            <i class="bi bi-plus-circle"></i> Log Meal
-          </a>
-        </div>
 
-        {% set targets = {'calories': 2000, 'protein_g': 50, 'carbs_g': 275, 'fat_g': 78, 'fiber_g': 28} %}
+    <!-- ── Player card ── -->
+    <div class="col-md-4 col-lg-3 fade-in-up">
+        <div class="card border-0 shadow-sm h-100">
+        <div class="card-body text-center p-4">
 
-        {% if today_totals.meal_count == 0 %}
-        <div class="text-center py-3 text-muted">
-          <div style="font-size:2.5rem">🍽</div>
-          <p class="mt-2 mb-0">No meals logged today. <a href="{{ url_for('food_log.index') }}">Log your first meal!</a></p>
-        </div>
-        {% else %}
-        <div class="row text-center g-3 mb-3">
-          {% for label, key, unit, color in [
-            ('Calories','calories','kcal','danger'),
-            ('Protein','protein_g','g','primary'),
-            ('Carbs','carbs_g','g','warning'),
-            ('Fat','fat_g','g','success'),
-            ('Fiber','fiber_g','g','info'),
-          ] %}
-          <div class="col">
-            <div class="fw-bold text-{{ color }} fs-5">
-              {{ today_totals[key]|round(1) }}
-              <small class="text-muted fs-6">{{ unit }}</small>
+            <!-- Avatar -->
+            <div class="rounded-circle bg-success text-white d-flex align-items-center
+                        justify-content-center fw-bold mx-auto mb-3 pulse"
+                style="width:72px;height:72px;font-size:1.8rem;">
+            {{ current_user.display_name[0]|upper }}
             </div>
-            <div class="nutrient-bar-label">{{ label }}</div>
-            <div class="progress progress-sm">
-              <div class="progress-bar bg-{{ color }}"
-                   style="width:{{ [((today_totals[key] / targets[key]) * 100)|int, 100]|min }}%">
-              </div>
+            <h5 class="fw-bold mb-0">{{ current_user.display_name }}</h5>
+            <div class="text-muted small mb-2">{{ current_user.level_title }}</div>
+            <span class="badge bg-success mb-3 px-3" style="border-radius:20px;">
+            Level {{ current_user.level }}
+            </span>
+
+            <!-- XP bar -->
+            <div class="xp-bar-wrap mb-1">
+            <div class="xp-bar" style="width:{{ current_user.xp_progress_percent() }}%"></div>
             </div>
-            <div class="text-muted" style="font-size:.65rem">/ {{ targets[key] }}{{ unit }}</div>
-          </div>
-          {% endfor %}
-        </div>
+            <div class="d-flex justify-content-between" style="font-size:.72rem;color:var(--text-muted);">
+            <span>{{ current_user.xp_points }} XP</span>
+            <span>+{{ current_user.xp_for_next_level() }} to next</span>
+            </div>
 
-        <!-- Recent meal chips -->
-        <div class="d-flex flex-wrap gap-2">
-          {% for log in recent_logs %}
-          <span class="badge bg-light text-dark meal-chip border">
-            {% if log.food_category == 'vegetable' %}🥦
-            {% elif log.food_category == 'fruit' %}🍓
-            {% elif log.food_category == 'protein' %}🥩
-            {% elif log.food_category == 'grain' %}🌾
-            {% elif log.food_category == 'dairy' %}🥛
-            {% else %}🍽{% endif %}
-            {{ log.food_name }} <span class="text-muted">{{ log.calories|int }} kcal</span>
-          </span>
-          {% endfor %}
-        </div>
-        {% endif %}
-      </div>
-    </div>
-
-    <!-- Active quests -->
-    <div class="card border-0 shadow-sm">
-      <div class="card-body p-4">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <h5 class="fw-bold mb-0">⚔️ Active Quests</h5>
-          <a href="{{ url_for('quests.index') }}" class="btn btn-sm btn-outline-success">View All</a>
-        </div>
-        {% if active_quests %}
-        <div class="d-flex flex-column gap-3">
-          {% for uq in active_quests %}
-          <div class="card border-0 bg-light quest-mini {{ uq.quest.difficulty }}">
-            <div class="card-body py-3 px-3">
-              <div class="d-flex justify-content-between align-items-start">
-                <div class="d-flex gap-2">
-                  <span style="font-size:1.5rem">{{ uq.quest.icon }}</span>
-                  <div>
-                    <div class="fw-semibold">{{ uq.quest.title }}</div>
-                    <div class="text-muted small">{{ uq.quest.description }}</div>
-                  </div>
+            <!-- Stats -->
+            <div class="row g-2 mt-3">
+            {% for val, label, color in [
+                (current_user.current_streak, '🔥 Streak', 'danger'),
+                (current_user.total_meals_logged, '🍽 Meals', 'primary'),
+                (current_user.total_quests_completed, '⚔️ Quests', 'success'),
+            ] %}
+            <div class="col-4">
+                <div class="stat-box">
+                <div class="stat-value text-{{ color }}">{{ val }}</div>
+                <div class="stat-label">{{ label }}</div>
                 </div>
-                <span class="badge bg-warning text-dark ms-2" style="white-space:nowrap">
-                  +{{ uq.quest.xp_reward }} XP
-                </span>
-              </div>
-              <div class="progress mt-2" style="height:6px;border-radius:20px;">
-                <div class="progress-bar bg-success" style="width:{{ uq.progress_percent() }}%"></div>
-              </div>
-              <div class="d-flex justify-content-between mt-1">
-                <small class="text-muted">{{ uq.progress }} / {{ uq.quest.criteria_target }}</small>
-                <small class="text-muted">{{ uq.progress_percent() }}%</small>
-              </div>
             </div>
-          </div>
-          {% endfor %}
+            {% endfor %}
+            </div>
+
+            <!-- Weekly rank -->
+            {% if my_rank %}
+            <div class="mt-3 p-2 rounded" style="background:rgba(255,193,7,.12);">
+            <div class="fw-bold text-warning" style="font-size:.9rem;">
+                {% if my_rank == 1 %}🥇{% elif my_rank == 2 %}🥈{% elif my_rank == 3 %}🥉
+                {% else %}#{{ my_rank }}{% endif %} Weekly Rank
+            </div>
+            <div style="font-size:.72rem;color:var(--text-muted);">
+                {{ my_entry.xp_this_week if my_entry else 0 }} XP this week
+            </div>
+            </div>
+            {% endif %}
+
+            <!-- 7-day activity grid -->
+            <div class="mt-3">
+            <div class="text-muted mb-2" style="font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;">
+                This Week
+            </div>
+            <div class="d-flex justify-content-center gap-1">
+                {% for day in weekly_summary.activity_grid %}
+                <div class="activity-dot {{ 'logged' if day.logged else 'unlogged' }}"
+                    title="{{ day.date.strftime('%A') }} — {{ 'logged' if day.logged else 'not logged' }}">
+                {{ day.label[0] }}
+                </div>
+                {% endfor %}
+            </div>
+            <div class="text-muted mt-1" style="font-size:.7rem;">
+                {{ weekly_summary.days_logged }}/7 days logged
+            </div>
+            </div>
+
         </div>
-        {% else %}
-        <div class="text-center py-3 text-muted">
-          <p class="mb-0">No active quests. <a href="{{ url_for('quests.index') }}">Head to the quest board!</a></p>
         </div>
-        {% endif %}
-      </div>
     </div>
 
-  </div>
-</div>
+    <!-- ── Main content ── -->
+    <div class="col-md-8 col-lg-9">
+
+        <!-- Behavioural nudges -->
+        {% if nudges %}
+        <div class="row g-2 mb-4 fade-in-up">
+        {% for nudge in nudges %}
+        <div class="col-md-{{ 12 // nudges|length }}">
+            <div class="nudge-card nudge-{{ nudge.type }} p-3 h-100">
+            <div class="d-flex align-items-start gap-2">
+                <span style="font-size:1.4rem;line-height:1;">{{ nudge.icon }}</span>
+                <div class="flex-grow-1">
+                <div class="fw-bold small mb-1">{{ nudge.title }}</div>
+                <div class="text-muted" style="font-size:.8rem;">{{ nudge.message }}</div>
+                {% if nudge.action and nudge.url %}
+                <a href="{{ url_for(nudge.url) }}"
+                    class="btn btn-sm btn-success mt-2" style="font-size:.75rem;padding:.25rem .6rem;">
+                    {{ nudge.action }} →
+                </a>
+                {% endif %}
+                </div>
+            </div>
+            </div>
+        </div>
+        {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Today's nutrition -->
+        <div class="card border-0 shadow-sm mb-4 fade-in-up">
+        <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold mb-0">📊 Today's Nutrition</h5>
+            <a href="{{ url_for('food_log.index') }}" class="btn btn-success btn-sm">
+                <i class="bi bi-plus-circle"></i> Log Meal
+            </a>
+            </div>
+
+            {% set targets = {'calories':2000,'protein_g':50,'carbs_g':275,'fat_g':78,'fiber_g':28} %}
+
+            {% if today_totals.meal_count == 0 %}
+            <div class="text-center py-3 text-muted">
+            <div style="font-size:2.5rem;">🍽</div>
+            <p class="mt-2 mb-0 small">No meals logged yet today.
+                <a href="{{ url_for('food_log.index') }}" class="text-success">Log your first meal!</a>
+            </p>
+            </div>
+            {% else %}
+            <div class="row g-3 mb-3">
+            {% for label, key, unit, color in [
+                ('Calories','calories','kcal','danger'),
+                ('Protein','protein_g','g','primary'),
+                ('Carbs','carbs_g','g','warning'),
+                ('Fat','fat_g','g','success'),
+                ('Fiber','fiber_g','g','info'),
+            ] %}
+            <div class="col nutrient-col text-center">
+                <div class="val text-{{ color }}">
+                {{ today_totals[key]|round(1) }}
+                <small class="text-muted fw-normal" style="font-size:.6rem;"> {{ unit }}</small>
+                </div>
+                <div class="lbl">{{ label }}</div>
+                <div class="progress progress-sm">
+                <div class="progress-bar bg-{{ color }}"
+                    style="width:{{ [((today_totals[key]/targets[key])*100)|int, 100]|min }}%"></div>
+                </div>
+                <div class="text-muted" style="font-size:.62rem;">/ {{ targets[key] }}</div>
+            </div>
+            {% endfor %}
+            </div>
+
+            <div class="d-flex flex-wrap gap-2 pt-2 border-top">
+            {% for log in recent_logs %}
+            <span class="badge bg-light text-dark meal-chip border">
+                {% if log.food_category=='vegetable' %}🥦
+                {% elif log.food_category=='fruit' %}🍓
+                {% elif log.food_category=='protein' %}🥩
+                {% elif log.food_category=='grain' %}🌾
+                {% elif log.food_category=='dairy' %}🥛
+                {% else %}🍽{% endif %}
+                {{ log.food_name }}
+                <span class="text-muted">{{ log.calories|int }} kcal</span>
+            </span>
+            {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+        </div>
+
+        <!-- Weekly summary + active quests (side by side on desktop) -->
+        <div class="row g-4">
+
+        <!-- Weekly summary -->
+        <div class="col-md-5">
+            <div class="card border-0 shadow-sm h-100 fade-in-up">
+            <div class="card-body p-4">
+                <h5 class="fw-bold mb-3">📅 This Week</h5>
+                <div class="row g-2 mb-3">
+                {% for val, label, color in [
+                    (weekly_summary.days_logged, 'Days Logged', 'success'),
+                    (weekly_summary.total_meals, 'Total Meals', 'primary'),
+                    (weekly_summary.avg_calories|int, 'Avg Calories', 'danger'),
+                ] %}
+                <div class="col-4">
+                    <div class="stat-box">
+                    <div class="stat-value text-{{ color }}">{{ val }}</div>
+                    <div class="stat-label">{{ label }}</div>
+                    </div>
+                </div>
+                {% endfor %}
+                </div>
+
+                <!-- Weekly completion bar -->
+                <div class="mb-1" style="font-size:.75rem;color:var(--text-muted);">
+                Weekly consistency — {{ weekly_summary.completion_pct }}%
+                </div>
+                <div class="progress progress-sm mb-3">
+                <div class="progress-bar bg-success"
+                    style="width:{{ weekly_summary.completion_pct }}%"></div>
+                </div>
+
+                <a href="{{ url_for('food_log.history') }}"
+                class="btn btn-outline-secondary btn-sm w-100">
+                <i class="bi bi-clock-history"></i> View Full History
+                </a>
+            </div>
+            </div>
+        </div>
+
+        <!-- Active quests -->
+        <div class="col-md-7">
+            <div class="card border-0 shadow-sm h-100 fade-in-up">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0">⚔️ Active Quests</h5>
+                <a href="{{ url_for('quests.index') }}"
+                    class="btn btn-sm btn-outline-success">View All</a>
+                </div>
+                {% if active_quests %}
+                <div class="d-flex flex-column gap-3">
+                {% for uq in active_quests %}
+                <div class="p-3 rounded bg-light quest-accent {{ uq.quest.difficulty }}">
+                    <div class="d-flex justify-content-between align-items-start">
+                    <div class="d-flex gap-2">
+                        <span style="font-size:1.4rem">{{ uq.quest.icon }}</span>
+                        <div>
+                        <div class="fw-semibold small">{{ uq.quest.title }}</div>
+                        <div class="text-muted" style="font-size:.75rem;">{{ uq.quest.description }}</div>
+                        </div>
+                    </div>
+                    <span class="badge bg-warning text-dark ms-2" style="white-space:nowrap;font-size:.7rem;">
+                        +{{ uq.quest.xp_reward }} XP
+                    </span>
+                    </div>
+                    <div class="progress mt-2 progress-sm">
+                    <div class="progress-bar bg-success" style="width:{{ uq.progress_percent() }}%"></div>
+                    </div>
+                    <div class="d-flex justify-content-between mt-1">
+                    <small class="text-muted">{{ uq.progress }} / {{ uq.quest.criteria_target }}</small>
+                    <small class="text-muted">{{ uq.progress_percent() }}%</small>
+                    </div>
+                </div>
+                {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-3 text-muted">
+                <p class="mb-0 small">No active quests.
+                    <a href="{{ url_for('quests.index') }}" class="text-success">Head to the quest board!</a>
+                </p>
+                </div>
+                {% endif %}
+            </div>
+            </div>
+        </div>
+
+        </div><!-- /row -->
+    </div><!-- /main -->
+</div><!-- /row -->
 {% endblock %}

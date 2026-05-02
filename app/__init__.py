@@ -31,6 +31,7 @@ def create_app(config_name='default'):
     from app.routes.coach import coach_bp
     from app.routes.leaderboard import leaderboard_bp
     from app.routes.profile import profile_bp
+    from app.routes.evaluation import evaluation_bp # type: ignore
 
     app.register_blueprint(auth_bp, url_prefix='/auth')
     app.register_blueprint(main_bp)
@@ -40,6 +41,7 @@ def create_app(config_name='default'):
     app.register_blueprint(coach_bp, url_prefix='/coach')
     app.register_blueprint(leaderboard_bp, url_prefix='/leaderboard')
     app.register_blueprint(profile_bp, url_prefix='/profile')
+    app.register_blueprint(evaluation_bp, url_prefix='/eval')
 
     # User loader for Flask-Login
     from app.models.user import User

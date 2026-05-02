@@ -82,38 +82,48 @@ def generate_quest():
         flash('Could not generate a quest right now. Please try again later.', 'warning')
         return redirect(url_for('quests.index'))
 
-    # Check the user doesn't already have this exact quest title active
-    existing = Quest.query.filter_by(
-        title=quest_data['title'],
-        ai_generated_for_user=current_user.id
+    from datetime import datetime
+
+    # Only block if the user has this exact quest title currently active
+    # (not completed and not expired) — allow regenerating after completion
+    existing_active = UserQuest.query.join(UserQuest.quest).filter(
+        UserQuest.user_id == current_user.id,
+        UserQuest.is_completed == False,
+        Quest.title == quest_data['title'],
+        Quest.ai_generated_for_user == current_user.id,
+        db.or_(UserQuest.expires_at == None,
+               UserQuest.expires_at > datetime.utcnow())
     ).first()
 
-    if existing:
-        flash('You already have a similar AI quest active!', 'info')
+    if existing_active:
+        flash('You already have this AI quest active! Complete it first.', 'info')
         return redirect(url_for('quests.index'))
 
-    # Save the new quest
+    # Save the new quest and commit fully before assigning
     quest = Quest(
-        title                = quest_data['title'],
-        description          = quest_data['description'],
-        icon                 = quest_data['icon'],
-        difficulty           = quest_data['difficulty'],
-        xp_reward            = quest_data['xp_reward'],
-        criteria_type        = quest_data['criteria_type'],
-        criteria_target      = quest_data['criteria_target'],
-        quest_type           = 'ai_generated',
-        is_active            = True,
+        title                 = quest_data['title'],
+        description           = quest_data['description'],
+        icon                  = quest_data['icon'],
+        difficulty            = quest_data['difficulty'],
+        xp_reward             = int(quest_data['xp_reward']),
+        criteria_type         = quest_data['criteria_type'],
+        criteria_target       = int(quest_data['criteria_target']),
+        quest_type            = 'ai_generated',
+        is_active             = True,
         ai_generated_for_user = current_user.id,
     )
     db.session.add(quest)
-    db.session.flush()  # get quest.id before committing
+    db.session.commit()  # commit first so quest.id is guaranteed
 
-    # Assign it immediately to the user
-    uq = UserQuest(user_id=current_user.id, quest_id=quest.id)
+    # Now assign it to the user
+    uq = UserQuest(
+        user_id  = current_user.id,
+        quest_id = quest.id,
+    )
     db.session.add(uq)
     db.session.commit()
 
-    # Small XP bonus for generating a quest
+    # Small XP bonus
     award_xp(current_user, 5, reason='Generated AI quest')
 
     flash(f'{quest.icon} New personalised quest generated: {quest.title}!', 'success')

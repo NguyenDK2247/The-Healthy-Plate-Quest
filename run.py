@@ -1,5 +1,5 @@
 from app import create_app, db
-from app.models import User, FoodLog, Quest, UserQuest, Badge, UserBadge, LeaderboardEntry
+from app.models import User, FoodLog, Quest, UserQuest, Badge, UserBadge, LeaderboardEntry, UsabilityResponse, FeedbackResponse, SessionEvent
 from app.models.badge import DEFAULT_BADGES
 
 app = create_app('development')
@@ -11,14 +11,17 @@ def make_shell_context():
         'db': db, 'User': User, 'FoodLog': FoodLog, 'Quest': Quest,
         'UserQuest': UserQuest, 'Badge': Badge, 'UserBadge': UserBadge,
         'LeaderboardEntry': LeaderboardEntry,
+        'UsabilityResponse': UsabilityResponse,
+        'FeedbackResponse': FeedbackResponse,
+        'SessionEvent': SessionEvent,
     }
 
 
 @app.cli.command('init-db')
 def init_db():
     """Initialize the database and seed default data."""
-    db.create_all()
-    print('✅ Database tables created.')
+    db.create_all()  # Creates all tables including evaluation models
+    print('✅ Database tables created (including evaluation tables).')
 
     # Seed badges
     if Badge.query.count() == 0:

@@ -167,31 +167,33 @@ def run_all_badge_checks(user):
 # ─────────────────────────────────────────────
 
 def assign_daily_quests(user, force=False):
-    """
-    Assign today's daily quests to a user if they don't already have them.
-    Call this on dashboard load or first login of the day.
-    Returns list of newly assigned UserQuest objects.
-    """
     from app.models.quest import Quest, UserQuest
 
     today_start = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
-    tomorrow = today_start + timedelta(days=1)
+    tomorrow    = today_start + timedelta(days=1)
 
-    # Check if already assigned today
-    existing = UserQuest.query.filter(
+    # Check if already assigned a fresh daily quest TODAY specifically
+    existing_today = UserQuest.query.filter(
         UserQuest.user_id == user.id,
         UserQuest.assigned_at >= today_start,
+        UserQuest.is_completed == False,
+    ).join(UserQuest.quest).filter(
+        Quest.quest_type == 'daily'
     ).first()
 
-    if existing and not force:
+    if existing_today and not force:
         return []
 
-    # Pick up to 3 active daily quests not already in progress
+    # Only exclude quests that are currently active and not expired
+    now = datetime.utcnow()
     active_quest_ids = {
-        uq.quest_id for uq in UserQuest.query.filter_by(
-            user_id=user.id, is_completed=False
+        uq.quest_id for uq in UserQuest.query.filter(
+            UserQuest.user_id == user.id,
+            UserQuest.is_completed == False,
+            db.or_(UserQuest.expires_at == None, UserQuest.expires_at > now)
         ).all()
     }
+
     daily_quests = Quest.query.filter(
         Quest.quest_type == 'daily',
         Quest.is_active == True,
@@ -201,9 +203,9 @@ def assign_daily_quests(user, force=False):
     new_assignments = []
     for quest in daily_quests:
         uq = UserQuest(
-            user_id=user.id,
-            quest_id=quest.id,
-            expires_at=tomorrow,
+            user_id    = user.id,
+            quest_id   = quest.id,
+            expires_at = tomorrow,
         )
         db.session.add(uq)
         new_assignments.append(uq)

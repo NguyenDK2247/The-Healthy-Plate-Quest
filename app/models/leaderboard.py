@@ -42,11 +42,21 @@ class LeaderboardEntry(db.Model):
         week, year = cls.get_current_week()
         entry = cls.query.filter_by(user_id=user_id, week_number=week, year=year).first()
         if entry is None:
-            entry = cls(user_id=user_id, week_number=week, year=year)
+            entry = cls(
+                user_id=user_id,
+                week_number=week,
+                year=year,
+                xp_this_week=0,
+                meals_logged=0,
+                quests_completed=0,
+            )
             db.session.add(entry)
-        entry.xp_this_week += xp_delta
-        entry.meals_logged += meals_delta
-        entry.quests_completed += quests_delta
+            db.session.flush()  # assign ID before updating
+
+        # Guard against NULL values from existing rows
+        entry.xp_this_week    = (entry.xp_this_week    or 0) + xp_delta
+        entry.meals_logged    = (entry.meals_logged     or 0) + meals_delta
+        entry.quests_completed = (entry.quests_completed or 0) + quests_delta
         db.session.commit()
         return entry
 

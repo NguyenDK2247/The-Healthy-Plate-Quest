@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% block title %}Feedback | Healthy Plate Quest{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+
+        <div class="text-center mb-4">
+        <div style="font-size:3rem">💬</div>
+        <h2 class="fw-bold mt-2 mb-1">Your Feedback</h2>
+        <p class="text-muted">
+            A few open-ended questions to help improve the app.
+            All answers are anonymous and used only for research purposes.
+        </p>
+        </div>
+
+        <form method="POST">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body p-4">
+            <div class="d-flex flex-column gap-4">
+
+                <div>
+                <label class="form-label fw-semibold">
+                    ⭐ Overall Rating
+                </label>
+                <div class="d-flex gap-2">
+                    {% for i in range(1, 6) %}
+                    <div>
+                    <input type="radio" class="btn-check" name="overall_rating"
+                            id="star{{ i }}" value="{{ i }}" required
+                            {{ 'checked' if existing and existing.overall_rating == i }}>
+                    <label class="btn btn-outline-warning btn-lg" for="star{{ i }}">
+                        {{ '★' * i }}
+                    </label>
+                    </div>
+                    {% endfor %}
+                </div>
+                </div>
+
+                <div>
+                <label class="form-label fw-semibold">
+                    🟢 What did you enjoy most about the app?
+                </label>
+                <textarea name="what_worked" class="form-control" rows="3"
+                            placeholder="e.g. The quests kept me engaged, the food search was easy...">{{ existing.what_worked if existing else '' }}</textarea>
+                </div>
+
+                <div>
+                <label class="form-label fw-semibold">
+                    🔴 What was frustrating or confusing?
+                </label>
+                <textarea name="what_didnt" class="form-control" rows="3"
+                            placeholder="e.g. I wasn't sure how to...">{{ existing.what_didnt if existing else '' }}</textarea>
+                </div>
+
+                <div>
+                <label class="form-label fw-semibold">
+                    🤖 What did you think of Coach Vita (the AI coach)?
+                </label>
+                <textarea name="ai_coach_comment" class="form-control" rows="3"
+                            placeholder="Was the coaching useful? Did it feel personalised? Did it affect your motivation?">{{ existing.ai_coach_comment if existing else '' }}</textarea>
+                </div>
+
+                <div>
+                <label class="form-label fw-semibold">
+                    💡 What one feature would you add or change?
+                </label>
+                <textarea name="suggestion" class="form-control" rows="2"
+                            placeholder="Your idea here...">{{ existing.suggestion if existing else '' }}</textarea>
+                </div>
+
+                <div>
+                <label class="form-label fw-semibold">
+                    Would you recommend this app to a friend?
+                </label>
+                <div class="d-flex gap-3">
+                    <div class="form-check">
+                    <input type="radio" class="form-check-input" name="would_recommend"
+                            id="rec_yes" value="yes"
+                            {{ 'checked' if existing and existing.would_recommend }}>
+                    <label class="form-check-label" for="rec_yes">Yes 👍</label>
+                    </div>
+                    <div class="form-check">
+                    <input type="radio" class="form-check-input" name="would_recommend"
+                            id="rec_no" value="no"
+                            {{ 'checked' if existing and existing.would_recommend == False }}>
+                    <label class="form-check-label" for="rec_no">No 👎</label>
+                    </div>
+                </div>
+                </div>
+
+            </div>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-success btn-lg w-100">
+            Submit Feedback ✅
+        </button>
+        </form>
+
+    </div>
+</div>
+{% endblock %}

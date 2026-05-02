@@ -49,8 +49,12 @@
 
             <!-- Avatar placeholder -->
             <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center fw-bold"
-                style="width:42px;height:42px;flex-shrink:0;font-size:1.1rem;">
+                style="width:42px;height:42px;flex-shrink:0;font-size:1.4rem;">
+            {% if user and user.avatar_url and user.avatar_url != 'default_avatar.png' %}
+                {{ user.avatar_url }}
+            {% else %}
                 {{ (user.display_name or user.username)[0]|upper if user else '?' }}
+            {% endif %}
             </div>
 
             <!-- Name + level -->

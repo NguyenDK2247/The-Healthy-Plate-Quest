@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+{% block title %}Study Results | Healthy Plate Quest{% endblock %}
+
+{% block extra_css %}
+<style>
+    .stat-card { border-radius:14px; text-align:center; padding:1.5rem; }
+    .stat-card .number { font-size:2.2rem; font-weight:800; font-family:'Nunito',sans-serif; }
+    .grade-pill { border-radius:20px; font-size:.78rem; font-weight:700; padding:.3rem .8rem; }
+    .sus-bar { height:10px; border-radius:20px; }
+    table th { font-size:.78rem; text-transform:uppercase; letter-spacing:.06em; color:var(--text-muted); }
+    table td { font-size:.88rem; vertical-align:middle; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold mb-0">📊 Study Results Dashboard</h2>
+        <p class="text-muted mb-0">Live analytics for The Healthy Plate Quest user evaluation.</p>
+    </div>
+    <a href="{{ url_for('evaluation.export_csv') }}" class="btn btn-success">
+        <i class="bi bi-download"></i> Export CSV
+    </a>
+    </div>
+
+    <!-- Top-level stats -->
+    <div class="row g-3 mb-4">
+    {% for val, label, color in [
+        (user_stats|length, 'Participants', 'success'),
+        (total_meals, 'Meals Logged', 'primary'),
+        (total_quests, 'Quests Completed', 'warning'),
+        (total_coach, 'Coach Messages', 'info'),
+        (avg_engage|string + '%', 'Avg Engagement Rate', 'danger'),
+    ] %}
+    <div class="col-6 col-md-4 col-lg">
+        <div class="card border-0 shadow-sm stat-card">
+        <div class="number text-{{ color }}">{{ val }}</div>
+        <div class="text-muted small">{{ label }}</div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- SUS Summary -->
+{% if sus_summary %}
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body p-4">
+        <h5 class="fw-bold mb-3">📋 SUS Score Summary (n={{ sus_summary.n }})</h5>
+        <div class="row g-3 mb-3">
+        {% for val, label, color in [
+            (sus_summary.mean, 'Mean SUS Score', 'success'),
+            (sus_summary.min, 'Minimum', 'warning'),
+            (sus_summary.max, 'Maximum', 'primary'),
+            (sus_summary.above_68, 'Above Average (≥68)', 'info'),
+            (sus_summary.ai_coach_mean or 'N/A', 'Avg AI Coach Rating', 'purple'),
+        ] %}
+        <div class="col-6 col-md-4 col-lg text-center">
+            <div class="fw-bold fs-4 text-{{ color if color != 'purple' else 'dark' }}">{{ val }}</div>
+            <div class="text-muted small">{{ label }}</div>
+        </div>
+        {% endfor %}
+        </div>
+        <div class="progress sus-bar mb-1">
+        <div class="progress-bar bg-success" style="width:{{ sus_summary.mean }}%"></div>
+        </div>
+        <div class="d-flex justify-content-between">
+        <small class="text-muted">0 — Awful</small>
+        <small class="text-success fw-bold">Mean: {{ sus_summary.mean }}</small>
+        <small class="text-muted">100 — Excellent</small>
+        </div>
+
+        <!-- Grade distribution -->
+        <div class="d-flex gap-2 flex-wrap mt-3">
+        {% for grade, count in sus_summary.grades.items() %}
+        {% if count > 0 %}
+        <span class="grade-pill bg-{{ 'success' if grade == 'Excellent' else ('primary' if grade == 'Good' else ('warning text-dark' if grade == 'OK' else 'danger')) }}">
+            {{ grade }}: {{ count }}
+        </span>
+        {% endif %}
+        {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Per-user table -->
+<div class="card border-0 shadow-sm">
+    <div class="card-body p-4">
+        <h5 class="fw-bold mb-3">👥 Participant Data</h5>
+        <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+            <tr>
+                <th>User</th>
+                <th>Age</th>
+                <th>Goal</th>
+                <th>Days Active</th>
+                <th>Engagement</th>
+                <th>Meals</th>
+                <th>Quests</th>
+                <th>Streak</th>
+                <th>XP</th>
+                <th>Coach Msgs</th>
+                <th>SUS</th>
+                <th>AI Coach</th>
+                <th>Rating</th>
+                <th>Recommend</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for s in user_stats %}
+            <tr>
+                <td class="fw-semibold">{{ s.username }}</td>
+                <td>{{ s.age or '—' }}</td>
+                <td><span class="badge bg-light text-dark" style="font-size:.72rem;">{{ s.nutrition_goal.replace('_',' ')|title }}</span></td>
+                <td>{{ s.days_active }}/{{ s.days_since_join }}</td>
+                <td>
+                <div class="progress" style="height:6px;width:60px;border-radius:20px;">
+                    <div class="progress-bar bg-success" style="width:{{ [s.engagement_rate,100]|min }}%"></div>
+                </div>
+                <small class="text-muted">{{ s.engagement_rate }}%</small>
+                </td>
+                <td>{{ s.total_meals }}</td>
+                <td>{{ s.quests_completed }}</td>
+                <td>{{ s.longest_streak }}🔥</td>
+                <td>{{ s.xp_points }}</td>
+                <td>{{ s.coach_messages }}</td>
+                <td>
+                {% if s.sus_score %}
+                <span class="fw-bold text-{{ 'success' if s.sus_score >= 68 else 'danger' }}">
+                    {{ s.sus_score|round(1) }}
+                </span>
+                <small class="text-muted d-block" style="font-size:.68rem;">{{ s.sus_grade }}</small>
+                {% else %}—{% endif %}
+                </td>
+                <td>{{ s.ai_coach_avg or '—' }}</td>
+                <td>
+                {% if s.overall_rating %}
+                {{ '★' * s.overall_rating }}{{ '☆' * (5 - s.overall_rating) }}
+                {% else %}—{% endif %}
+                </td>
+                <td>
+                {% if s.would_recommend is not none %}
+                {{ '👍' if s.would_recommend else '👎' }}
+                {% else %}—{% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

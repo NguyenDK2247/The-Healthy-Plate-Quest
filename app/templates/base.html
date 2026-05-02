@@ -1,168 +1,145 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<meta name="theme-color" content="#2d9e5f">
-	<title>{% block title %}The Healthy Plate Quest{% endblock %}</title>
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css">
-	<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
-	{% block extra_css %}{% endblock %}
-	<script>
-		if (localStorage.getItem('darkMode') === 'true') {
-			document.documentElement.setAttribute('data-theme', 'dark');
-		}
-  	</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#2d9e5f">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>{% block title %}The Healthy Plate Quest{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    {% block extra_css %}{% endblock %}
+    <script>
+        if (localStorage.getItem('darkMode') === 'true') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
 </head>
 <body>
 
 {% if current_user.is_authenticated %}
 <!-- ── Desktop Navbar ── -->
 <nav class="navbar navbar-expand-md navbar-dark">
-	<div class="container">
-		<a class="navbar-brand fw-bold" href="{{ url_for('dashboard.index') }}">
-		🥗 Healthy Plate Quest
-		</a>
-		<button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
-		<span class="navbar-toggler-icon"></span>
-		</button>
-		<div class="collapse navbar-collapse" id="navMenu">
-		<ul class="navbar-nav me-auto gap-1">
-			<li class="nav-item">
-			<a class="nav-link {{ 'active-link' if request.endpoint == 'dashboard.index' }}"
-				href="{{ url_for('dashboard.index') }}">
-				<i class="bi bi-house"></i> Dashboard
-			</a>
-			</li>
-			<li class="nav-item">
-			<a class="nav-link {{ 'active-link' if request.endpoint and 'food_log' in request.endpoint }}"
-				href="{{ url_for('food_log.index') }}">
-				<i class="bi bi-journal-plus"></i> Log Meal
-			</a>
-			</li>
-			<li class="nav-item">
-			<a class="nav-link {{ 'active-link' if request.endpoint and 'quests' in request.endpoint }}"
-				href="{{ url_for('quests.index') }}">
-				<i class="bi bi-trophy"></i> Quests
-			</a>
-			</li>
-			<li class="nav-item">
-			<a class="nav-link {{ 'active-link' if request.endpoint == 'coach.index' }}"
-				href="{{ url_for('coach.index') }}">
-				<i class="bi bi-robot"></i> Coach Vita
-			</a>
-			</li>
-			<li class="nav-item">
-			<a class="nav-link {{ 'active-link' if request.endpoint == 'leaderboard.index' }}"
-				href="{{ url_for('leaderboard.index') }}">
-				<i class="bi bi-bar-chart"></i> Leaderboard
-			</a>
-			</li>
-		</ul>
-		<ul class="navbar-nav align-items-center gap-2">
-			<li class="nav-item">
-			<span class="xp-display text-warning">
-				⭐ {{ current_user.xp_points }} XP &nbsp;·&nbsp;
-				Lv.{{ current_user.level }}
-			</span>
-			</li>
-			<li class="nav-item">
-			<button id="darkModeToggle" class="btn btn-sm btn-outline-light" title="Toggle dark mode">
-				<i class="bi bi-moon-fill" id="darkModeIcon"></i>
-			</button>
-			</li>
-			<li class="nav-item dropdown">
-			<a class="nav-link dropdown-toggle fw-semibold" href="#" data-bs-toggle="dropdown">
-				{{ current_user.display_name }}
-			</a>
-			<ul class="dropdown-menu dropdown-menu-end shadow border-0">
-				<li>
-				<div class="dropdown-item-text text-muted small px-3 py-1">
-					{{ current_user.level_title }}
-				</div>
-				</li>
-				<li><hr class="dropdown-divider my-1"></li>
-				<li><a class="dropdown-item" href="{{ url_for('profile.index') }}"><i class="bi bi-person me-2"></i>My Profile</a></li>
-				<li><a class="dropdown-item" href="{{ url_for('profile.edit') }}"><i class="bi bi-pencil me-2"></i>Edit Profile</a></li>
-				<li><hr class="dropdown-divider my-1"></li>
-				<li><a class="dropdown-item text-danger" href="{{ url_for('auth.logout') }}"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
-			</ul>
-			</li>
-		</ul>
-		</div>
-	</div>
+    <div class="container">
+        <a class="navbar-brand" href="{{ url_for('dashboard.index') }}">
+        🥗 <span>The Healthy Plate Quest</span>
+        </a>
+
+        <div class="collapse navbar-collapse" id="navMenu">
+        <ul class="navbar-nav me-auto gap-1">
+            <li class="nav-item"><a class="nav-link {% if request.endpoint == 'dashboard.index' %}active{% endif %}"
+                href="{{ url_for('dashboard.index') }}"><i class="bi bi-house-fill"></i> Dashboard</a></li>
+            <li class="nav-item"><a class="nav-link {% if request.endpoint == 'food_log.index' %}active{% endif %}"
+                href="{{ url_for('food_log.index') }}"><i class="bi bi-journal-plus"></i> Log Meal</a></li>
+            <li class="nav-item"><a class="nav-link {% if request.endpoint == 'quests.index' %}active{% endif %}"
+                href="{{ url_for('quests.index') }}"><i class="bi bi-trophy-fill"></i> Quests</a></li>
+            <li class="nav-item"><a class="nav-link {% if request.endpoint == 'coach.index' %}active{% endif %}"
+                href="{{ url_for('coach.index') }}"><i class="bi bi-robot"></i> Coach Vita</a></li>
+            <li class="nav-item"><a class="nav-link {% if request.endpoint == 'leaderboard.index' %}active{% endif %}"
+                href="{{ url_for('leaderboard.index') }}"><i class="bi bi-bar-chart-fill"></i> Leaderboard</a></li>
+        </ul>
+
+        <ul class="navbar-nav align-items-center gap-2">
+            <li class="nav-item">
+            <span class="xp-nav-pill">
+                ⭐ {{ current_user.xp_points }} XP &nbsp;·&nbsp;
+                Lv.{{ current_user.level }}
+            </span>
+            </li>
+            <li class="nav-item">
+            <button id="darkModeToggle" class="btn btn-sm btn-outline-light" title="Toggle dark mode">
+                <i class="bi bi-moon-fill" id="darkModeIcon"></i>
+            </button>
+            </li>
+            <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#" data-bs-toggle="dropdown">
+                <div class="avatar-sm avatar">
+                    {% if current_user.avatar_url and current_user.avatar_url != 'default_avatar.png' %}
+                        {{ current_user.avatar_url }}
+                    {% else %}
+                        {{ current_user.display_name[0]|upper }}
+                    {% endif %}
+                </div>
+                <span class="d-none d-lg-inline">{{ current_user.display_name }}</span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end shadow border-0" style="border-radius:12px;min-width:180px;">
+                <li class="px-3 py-2 border-bottom">
+                <div class="fw-bold small">{{ current_user.display_name }}</div>
+                <div class="text-muted" style="font-size:.75rem;">{{ current_user.level_title }}</div>
+                </li>
+                <li><a class="dropdown-item py-2" href="{{ url_for('profile.index') }}"><i class="bi bi-person me-2"></i>My Profile</a></li>
+                <li><a class="dropdown-item py-2" href="{{ url_for('profile.edit') }}"><i class="bi bi-pencil me-2"></i>Edit Profile</a></li>
+                <li><hr class="dropdown-divider my-1"></li>
+                <li><a class="dropdown-item py-2 text-danger" href="{{ url_for('auth.logout') }}"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+            </ul>
+            </li>
+        </ul>
+        </div>
+    </div>
 </nav>
 
 <!-- ── Mobile Bottom Nav ── -->
-<nav class="mobile-nav">
-	<a href="{{ url_for('dashboard.index') }}" class="{{ 'active' if request.endpoint == 'dashboard.index' }}">
-		<i class="bi bi-house-fill"></i><span>Home</span>
-	</a>
-	<a href="{{ url_for('food_log.index') }}" class="{{ 'active' if request.endpoint and 'food_log' in request.endpoint }}">
-		<i class="bi bi-journal-plus"></i><span>Log</span>
-	</a>
-	<a href="{{ url_for('quests.index') }}" class="{{ 'active' if request.endpoint and 'quests' in request.endpoint }}">
-		<i class="bi bi-trophy-fill"></i><span>Quests</span>
-	</a>
-	<a href="{{ url_for('coach.index') }}" class="{{ 'active' if request.endpoint == 'coach.index' }}">
-		<i class="bi bi-robot"></i><span>Coach</span>
-	</a>
-	<a href="{{ url_for('profile.index') }}" class="{{ 'active' if request.endpoint and 'profile' in request.endpoint }}">
-		<i class="bi bi-person-fill"></i><span>Profile</span>
-	</a>
+<nav class="mobile-nav d-md-none">
+    <a href="{{ url_for('dashboard.index') }}" class="{% if request.endpoint == 'dashboard.index' %}active{% endif %}">
+        <i class="bi bi-house-fill"></i><span>Home</span>
+    </a>
+    <a href="{{ url_for('food_log.index') }}" class="{% if request.endpoint == 'food_log.index' %}active{% endif %}">
+        <i class="bi bi-journal-plus"></i><span>Log</span>
+    </a>
+    <a href="{{ url_for('quests.index') }}" class="{% if request.endpoint == 'quests.index' %}active{% endif %}">
+        <i class="bi bi-trophy-fill"></i><span>Quests</span>
+    </a>
+    <a href="{{ url_for('coach.index') }}" class="{% if request.endpoint == 'coach.index' %}active{% endif %}">
+        <i class="bi bi-robot"></i><span>Coach</span>
+    </a>
+    <a href="{{ url_for('profile.index') }}" class="{% if request.endpoint == 'profile.index' %}active{% endif %}">
+        <i class="bi bi-person-fill"></i><span>Profile</span>
+    </a>
 </nav>
 {% endif %}
 
 <div class="container mt-4">
-	{% with messages = get_flashed_messages(with_categories=true) %}
-		{% if messages %}
-		{% for category, message in messages %}
-		<div class="alert alert-{{ category }} alert-dismissible fade show fade-in-up" role="alert">
-			{{ message|safe }}
-			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-		</div>
-		{% endfor %}
-		{% endif %}
-	{% endwith %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show fade-in-up" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
+    {% endwith %}
 
-	{% block content %}{% endblock %}
-</div>
+    {% block content %}{% endblock %}
+    </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
-<script>
-	// Dark mode toggle
-	const toggle   = document.getElementById('darkModeToggle');
-	const icon     = document.getElementById('darkModeIcon');
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+    <script>
+    // Dark mode
+    const toggle = document.getElementById('darkModeToggle');
+    const icon   = document.getElementById('darkModeIcon');
 
-	function applyDarkMode(enabled) {
-		if (enabled) {
-		document.documentElement.setAttribute('data-theme', 'dark');
-		if (icon) icon.className = 'bi bi-sun-fill';
-		} else {
-		document.documentElement.removeAttribute('data-theme');
-		if (icon) icon.className = 'bi bi-moon-fill';
-		}
-  	}
+    function applyDarkMode(enabled) {
+        if (enabled) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        if (icon) icon.className = 'bi bi-sun-fill';
+        } else {
+        document.documentElement.removeAttribute('data-theme');
+        if (icon) icon.className = 'bi bi-moon-fill';
+        }
+    }
 
-	applyDarkMode(localStorage.getItem('darkMode') === 'true');
+    applyDarkMode(localStorage.getItem('darkMode') === 'true');
 
-	if (toggle) {
-		toggle.addEventListener('click', () => {
-		const isDark = localStorage.getItem('darkMode') === 'true';
-		localStorage.setItem('darkMode', !isDark);
-		applyDarkMode(!isDark);
-		});
-	}
-
-	// Auto-dismiss alerts after 5 seconds
-	document.querySelectorAll('.alert').forEach(el => {
-		setTimeout(() => {
-		const bsAlert = bootstrap.Alert.getOrCreateInstance(el);
-		bsAlert.close();
-		}, 5000);
-	});
-</script>
-{% block extra_js %}{% endblock %}
-</body>
+    if (toggle) {
+        toggle.addEventListener('click', () => {
+        const isDark = localStorage.getItem('darkMode') === 'true';
+        localStorage.setItem('darkMode', !isDark);
+        applyDarkMode(!isDark);
+        });
+    }
+    </script>
+    {% block extra_js %}{% endblock %}
+    </body>
 </html>

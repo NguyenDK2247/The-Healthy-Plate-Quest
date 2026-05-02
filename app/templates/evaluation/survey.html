@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% block title %}Usability Survey | Healthy Plate Quest{% endblock %}
+
+{% block extra_css %}
+<style>
+    .likert-group { display:flex; gap:.5rem; flex-wrap:wrap; }
+    .likert-btn input[type="radio"] { display:none; }
+    .likert-btn label {
+        display:flex; align-items:center; justify-content:center;
+        width:42px; height:42px; border-radius:10px;
+        border:2px solid var(--border); cursor:pointer;
+        font-weight:700; font-size:.9rem; transition:all .15s;
+        background:var(--bg-card);
+    }
+    .likert-btn input:checked + label {
+        background:var(--green); color:#fff; border-color:var(--green);
+    }
+    .likert-btn label:hover { border-color:var(--green); color:var(--green); }
+    .q-card { border-radius:12px; padding:1.25rem 1.5rem;
+                border-left:4px solid var(--green); background:var(--bg-card); }
+    .scale-labels { display:flex; justify-content:space-between;
+                    font-size:.72rem; color:var(--text-muted); margin-top:.3rem; }
+    .section-divider { border-top:2px dashed var(--border); margin:2rem 0; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+
+        <div class="text-center mb-4">
+        <div style="font-size:3rem">📋</div>
+        <h2 class="fw-bold mt-2 mb-1">Usability Survey</h2>
+        <p class="text-muted">
+            This survey is part of a bachelor thesis study. Your honest answers help
+            evaluate The Healthy Plate Quest. It takes about 3–5 minutes.
+        </p>
+        {% if existing %}
+        <div class="alert alert-info d-inline-block">
+            You've already submitted this survey — submitting again will replace your previous answers.
+        </div>
+        {% endif %}
+        </div>
+
+        <form method="POST">
+
+        <!-- SUS Section -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body p-4">
+            <h5 class="fw-bold mb-1">Part 1 — System Usability Scale (SUS)</h5>
+            <p class="text-muted small mb-4">
+                Rate each statement from <strong>1</strong> (Strongly Disagree) to <strong>5</strong> (Strongly Agree).
+            </p>
+
+            {% set sus_questions = [
+                (1,  'I think I would like to use this app frequently.'),
+                (2,  'I found the app unnecessarily complex.'),
+                (3,  'I thought the app was easy to use.'),
+                (4,  'I think I would need support from someone to use this app.'),
+                (5,  'I found the various functions in this app well integrated.'),
+                (6,  'I thought there was too much inconsistency in this app.'),
+                (7,  'I would imagine that most people would learn to use this app very quickly.'),
+                (8,  'I found the app very cumbersome to use.'),
+                (9,  'I felt very confident using the app.'),
+                (10, 'I needed to learn a lot of things before I could get going with this app.'),
+            ] %}
+
+            <div class="d-flex flex-column gap-3">
+                {% for num, text in sus_questions %}
+                <div class="q-card">
+                <div class="fw-semibold small mb-2">{{ loop.index }}. {{ text }}</div>
+                <div class="likert-group">
+                    {% for val in range(1, 6) %}
+                    <div class="likert-btn">
+                    <input type="radio" name="q{{ num }}" id="q{{ num }}_{{ val }}"
+                            value="{{ val }}" required
+                            {{ 'checked' if existing and existing['q'~num] == val }}>
+                    <label for="q{{ num }}_{{ val }}">{{ val }}</label>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="scale-labels"><span>Strongly Disagree</span><span>Strongly Agree</span></div>
+                </div>
+                {% endfor %}
+            </div>
+            </div>
+        </div>
+
+        <!-- AI Coach Section -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body p-4">
+            <h5 class="fw-bold mb-1">Part 2 — Coach Vita (AI Nutrition Coach)</h5>
+            <p class="text-muted small mb-4">
+                Rate each statement from <strong>1</strong> (Strongly Disagree) to <strong>5</strong> (Strongly Agree).
+            </p>
+
+            {% set ai_questions = [
+                ('ai_coach_motivated',   'Coach Vita made me feel motivated to eat healthier.'),
+                ('ai_coach_useful',      'Coach Vita\'s feedback on my meals was useful.'),
+                ('ai_coach_personal',    'The coaching felt personalised to my goals and preferences.'),
+                ('ai_coach_trustworthy', 'I trusted the nutritional advice from Coach Vita.'),
+            ] %}
+
+            <div class="d-flex flex-column gap-3">
+                {% for name, text in ai_questions %}
+                <div class="q-card" style="border-left-color:#6f42c1;">
+                <div class="fw-semibold small mb-2">{{ text }}</div>
+                <div class="likert-group">
+                    {% for val in range(1, 6) %}
+                    <div class="likert-btn">
+                    <input type="radio" name="{{ name }}" id="{{ name }}_{{ val }}"
+                            value="{{ val }}" required>
+                    <label for="{{ name }}_{{ val }}">{{ val }}</label>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="scale-labels"><span>Strongly Disagree</span><span>Strongly Agree</span></div>
+                </div>
+                {% endfor %}
+            </div>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-success btn-lg w-100">
+            Continue to Feedback →
+        </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

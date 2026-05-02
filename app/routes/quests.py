@@ -48,12 +48,25 @@ def claim(uq_id):
 @quests_bp.route('/browse')
 @login_required
 def browse():
-    assigned_ids = {uq.quest_id for uq in UserQuest.query.filter_by(user_id=current_user.id).all()}
+    from datetime import datetime
+    now = datetime.utcnow()
+
+    # Only exclude quests that are currently active and unexpired
+    # Expired daily quests from previous days should reappear as available
+    active_quest_ids = {
+        uq.quest_id for uq in UserQuest.query.filter(
+            UserQuest.user_id == current_user.id,
+            UserQuest.is_completed == False,
+            db.or_(UserQuest.expires_at == None, UserQuest.expires_at > now)
+        ).all()
+    }
+
     available = Quest.query.filter(
         Quest.is_active == True,
         Quest.quest_type.in_(['daily', 'weekly', 'special']),
-        ~Quest.id.in_(assigned_ids) if assigned_ids else True,
+        ~Quest.id.in_(active_quest_ids) if active_quest_ids else True,
     ).all()
+
     return render_template('quests/browse.html', available=available)
 
 

@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block title %}Dashboard | Healthy Plate Quest{% endblock %}
+{% block title %}Dashboard | The Healthy Plate Quest{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -72,7 +72,11 @@
             <div class="rounded-circle bg-success text-white d-flex align-items-center
                         justify-content-center fw-bold mx-auto mb-3 pulse"
                 style="width:72px;height:72px;font-size:1.8rem;">
-            {{ current_user.display_name[0]|upper }}
+            {% if current_user.avatar_url and current_user.avatar_url != 'default_avatar.png' %}
+                {{ current_user.avatar_url }}
+            {% else %}
+                {{ current_user.display_name[0]|upper }}
+            {% endif %}
             </div>
             <h5 class="fw-bold mb-0">{{ current_user.display_name }}</h5>
             <div class="text-muted small mb-2">{{ current_user.level_title }}</div>

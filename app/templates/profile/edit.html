@@ -7,46 +7,112 @@
         <div class="card-body p-4">
             <h3 class="fw-bold mb-4">✏️ Edit Profile</h3>
             <form method="POST">
+
+            <!-- Avatar picker -->
+            <div class="mb-4">
+                <label class="form-label fw-semibold">Profile Avatar</label>
+                <div class="d-flex flex-wrap gap-2" id="avatarPicker">
+                {% for emoji in ['🧑‍🍳','🥗','💪','🌱','🏃','🧘','🥦','🍎','⚡','🔥','🏆','🌟'] %}
+                <input type="radio" class="btn-check" name="avatar_url"
+                        id="av_{{ loop.index }}" value="{{ emoji }}"
+                        {{ 'checked' if current_user.avatar_url == emoji }}>
+                <label class="btn btn-outline-secondary"
+                        for="av_{{ loop.index }}"
+                        style="font-size:1.6rem;width:52px;height:52px;padding:0;
+                                display:flex;align-items:center;justify-content:center;
+                                border-radius:12px;">
+                    {{ emoji }}
+                </label>
+                {% endfor %}
+                </div>
+                <div class="form-text">Pick an emoji avatar to represent you.</div>
+            </div>
+
+            <!-- Display name -->
             <div class="mb-3">
-                <label class="form-label">Display Name</label>
+                <label class="form-label fw-semibold">Display Name</label>
                 <input type="text" name="display_name" class="form-control"
                     value="{{ current_user.display_name or current_user.username }}">
             </div>
+
+            <!-- Username -->
             <div class="mb-3">
-                <label class="form-label">Bio <small class="text-muted">(optional)</small></label>
-                <textarea name="bio" class="form-control" rows="2" maxlength="280">{{ current_user.bio or '' }}</textarea>
+                <label class="form-label fw-semibold">Username</label>
+                <input type="text" name="username" class="form-control"
+                    value="{{ current_user.username }}" minlength="3">
+                <div class="form-text">Changing your username will affect your login.</div>
             </div>
+
+            <!-- Bio -->
             <div class="mb-3">
-                <label class="form-label">Nutrition Goal</label>
+                <label class="form-label fw-semibold">Bio <small class="text-muted fw-normal">(optional)</small></label>
+                <textarea name="bio" class="form-control" rows="2"
+                        maxlength="280">{{ current_user.bio or '' }}</textarea>
+            </div>
+
+            <!-- Nutrition goal -->
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Nutrition Goal</label>
                 <select name="nutrition_goal" class="form-select">
                 {% for val, label in [('general','General Healthy Eating'),('energy','More Energy & Focus'),
-                    ('weight_management','Weight Management'),('gut_health','Gut Health'),('muscle_building','Muscle Building')] %}
+                    ('weight_management','Weight Management'),('gut_health','Gut Health'),
+                    ('muscle_building','Muscle Building')] %}
                 <option value="{{ val }}" {{ 'selected' if current_user.nutrition_goal == val }}>{{ label }}</option>
                 {% endfor %}
                 </select>
             </div>
+
+            <!-- Dietary preference -->
             <div class="mb-3">
-                <label class="form-label">Dietary Preference</label>
+                <label class="form-label fw-semibold">Dietary Preference</label>
                 <select name="dietary_preference" class="form-select">
                 {% for val in ['omnivore','vegetarian','vegan','pescatarian'] %}
                 <option value="{{ val }}" {{ 'selected' if current_user.dietary_preference == val }}>{{ val|title }}</option>
                 {% endfor %}
                 </select>
             </div>
+
+            <!-- Dietary restrictions -->
             <div class="mb-3">
-                <label class="form-label">Dietary Restrictions</label>
+                <label class="form-label fw-semibold">Dietary Restrictions</label>
                 <input type="text" name="dietary_restrictions" class="form-control"
-                    value="{{ current_user.dietary_restrictions or '' }}" placeholder="e.g. gluten, lactose">
+                    value="{{ current_user.dietary_restrictions or '' }}"
+                    placeholder="e.g. gluten, lactose">
+            </div>
+
+            <!-- Favourite ingredients -->
+            <div class="mb-4">
+                <label class="form-label fw-semibold">Favourite Ingredients</label>
+                <input type="text" name="favorite_ingredients" class="form-control"
+                    value="{{ current_user.favorite_ingredients or '' }}"
+                    placeholder="e.g. chicken, pasta, broccoli">
+            </div>
+
+            <hr class="my-4">
+
+            <!-- Change password -->
+            <h5 class="fw-bold mb-3">🔑 Change Password <small class="text-muted fw-normal fs-6">(optional)</small></h5>
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Current Password</label>
+                <input type="password" name="current_password" class="form-control"
+                    placeholder="Enter your current password">
+            </div>
+            <div class="mb-3">
+                <label class="form-label fw-semibold">New Password</label>
+                <input type="password" name="new_password" class="form-control"
+                    placeholder="At least 6 characters" minlength="6">
             </div>
             <div class="mb-4">
-                <label class="form-label">Favorite Ingredients</label>
-                <input type="text" name="favorite_ingredients" class="form-control"
-                    value="{{ current_user.favorite_ingredients or '' }}" placeholder="e.g. chicken, pasta, broccoli">
+                <label class="form-label fw-semibold">Confirm New Password</label>
+                <input type="password" name="confirm_password" class="form-control"
+                    placeholder="Repeat new password">
             </div>
+
             <div class="d-flex gap-2">
                 <button type="submit" class="btn btn-success">Save Changes</button>
                 <a href="{{ url_for('profile.index') }}" class="btn btn-outline-secondary">Cancel</a>
             </div>
+
             </form>
         </div>
         </div>

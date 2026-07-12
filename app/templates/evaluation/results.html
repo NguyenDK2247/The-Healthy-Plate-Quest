@@ -51,7 +51,7 @@
             (sus_summary.mean, 'Mean SUS Score', 'success'),
             (sus_summary.min, 'Minimum', 'warning'),
             (sus_summary.max, 'Maximum', 'primary'),
-            (sus_summary.above_68, 'Above Average (≥68)', 'info'),
+            (sus_summary.above_70, 'Above Average (≥70)', 'info'),
             (sus_summary.ai_coach_mean or 'N/A', 'Avg AI Coach Rating', 'purple'),
         ] %}
         <div class="col-6 col-md-4 col-lg text-center">
@@ -127,7 +127,7 @@
                 <td>{{ s.coach_messages }}</td>
                 <td>
                 {% if s.sus_score %}
-                <span class="fw-bold text-{{ 'success' if s.sus_score >= 68 else 'danger' }}">
+                <span class="fw-bold text-{{ 'success' if s.sus_score >= 70 else 'danger' }}">
                     {{ s.sus_score|round(1) }}
                 </span>
                 <small class="text-muted d-block" style="font-size:.68rem;">{{ s.sus_grade }}</small>

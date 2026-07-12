@@ -1,35 +1,35 @@
 {% extends 'base.html' %}
-{% block title %}Dashboard | The Healthy Plate Quest{% endblock %}
+{% block title %}Dashboard | Healthy Plate Quest{% endblock %}
 
 {% block extra_css %}
 <style>
-  .progress-sm { height:7px; border-radius:20px; }
-  .meal-chip   { font-size:.75rem; padding:.25rem .6rem; border-radius:8px; }
-  .quest-accent { border-left:4px solid #28a745; border-radius:0 var(--radius) var(--radius) 0; }
-  .quest-accent.medium { border-left-color:var(--orange); }
-  .quest-accent.hard   { border-left-color:#dc3545; }
-  .nutrient-col .val { font-size:1.2rem; font-weight:800; font-family:'Nunito',sans-serif; line-height:1; }
-  .nutrient-col .lbl { font-size:.65rem; text-transform:uppercase; letter-spacing:.06em; color:var(--text-muted); margin:.2rem 0; }
+    .progress-sm { height:7px; border-radius:20px; }
+    .meal-chip   { font-size:.75rem; padding:.25rem .6rem; border-radius:8px; }
+    .quest-accent { border-left:4px solid #28a745; border-radius:0 var(--radius) var(--radius) 0; }
+    .quest-accent.medium { border-left-color:var(--orange); }
+    .quest-accent.hard   { border-left-color:#dc3545; }
+    .nutrient-col .val { font-size:1.2rem; font-weight:800; font-family:'Nunito',sans-serif; line-height:1; }
+    .nutrient-col .lbl { font-size:.65rem; text-transform:uppercase; letter-spacing:.06em; color:var(--text-muted); margin:.2rem 0; }
 
-  /* Nudge cards */
-  .nudge-card { border-radius:12px; border:none; }
-  .nudge-loss   { background:linear-gradient(135deg,#fff3cd,#ffe8a1); border-left:4px solid #fd7e14; }
-  .nudge-streak { background:linear-gradient(135deg,#d4edda,#b8f0c8); border-left:4px solid #28a745; }
-  .nudge-tip    { background:linear-gradient(135deg,#d1ecf1,#b8e4ed); border-left:4px solid #17a2b8; }
-  .nudge-reward { background:linear-gradient(135deg,#f8d7da,#f5c1c8); border-left:4px solid #dc3545; }
-  .nudge-social { background:linear-gradient(135deg,#e2d9f3,#d0c4ec); border-left:4px solid #6f42c1; }
-  [data-theme="dark"] .nudge-loss   { background:rgba(253,126,20,.12); }
-  [data-theme="dark"] .nudge-streak { background:rgba(40,167,69,.12); }
-  [data-theme="dark"] .nudge-tip    { background:rgba(23,162,184,.12); }
-  [data-theme="dark"] .nudge-reward { background:rgba(220,53,69,.12); }
-  [data-theme="dark"] .nudge-social { background:rgba(111,66,193,.12); }
+    /* Nudge cards */
+    .nudge-card { border-radius:12px; border:none; }
+    .nudge-loss   { background:linear-gradient(135deg,#fff3cd,#ffe8a1); border-left:4px solid #fd7e14; }
+    .nudge-streak { background:linear-gradient(135deg,#d4edda,#b8f0c8); border-left:4px solid #28a745; }
+    .nudge-tip    { background:linear-gradient(135deg,#d1ecf1,#b8e4ed); border-left:4px solid #17a2b8; }
+    .nudge-reward { background:linear-gradient(135deg,#f8d7da,#f5c1c8); border-left:4px solid #dc3545; }
+    .nudge-social { background:linear-gradient(135deg,#e2d9f3,#d0c4ec); border-left:4px solid #6f42c1; }
+    [data-theme="dark"] .nudge-loss   { background:rgba(253,126,20,.12); }
+    [data-theme="dark"] .nudge-streak { background:rgba(40,167,69,.12); }
+    [data-theme="dark"] .nudge-tip    { background:rgba(23,162,184,.12); }
+    [data-theme="dark"] .nudge-reward { background:rgba(220,53,69,.12); }
+    [data-theme="dark"] .nudge-social { background:rgba(111,66,193,.12); }
 
-  /* Activity grid */
-  .activity-dot {
-    width:28px; height:28px; border-radius:6px;
-    display:flex; align-items:center; justify-content:center;
-    font-size:.6rem; font-weight:700; transition:transform .1s;
-  }
+    /* Activity grid */
+    .activity-dot {
+        width:28px; height:28px; border-radius:6px;
+        display:flex; align-items:center; justify-content:center;
+        font-size:.6rem; font-weight:700; transition:transform .1s;
+    }
   .activity-dot:hover { transform:scale(1.15); }
   .activity-dot.logged   { background:var(--green); color:#fff; }
   .activity-dot.unlogged { background:#e9ecef; color:var(--text-muted); }
@@ -58,8 +58,8 @@
             Use Shield (50 XP)
             </button>
         </form>
-    </div>
-    {% endif %}
+        </div>
+        {% endif %}
 
 
 
@@ -72,17 +72,30 @@
             <div class="rounded-circle bg-success text-white d-flex align-items-center
                         justify-content-center fw-bold mx-auto mb-3 pulse"
                 style="width:72px;height:72px;font-size:1.8rem;">
-            {% if current_user.avatar_url and current_user.avatar_url != 'default_avatar.png' %}
-                {{ current_user.avatar_url }}
-            {% else %}
-                {{ current_user.display_name[0]|upper }}
-            {% endif %}
+            {{ current_user.display_name[0]|upper }}
             </div>
             <h5 class="fw-bold mb-0">{{ current_user.display_name }}</h5>
             <div class="text-muted small mb-2">{{ current_user.level_title }}</div>
-            <span class="badge bg-success mb-3 px-3" style="border-radius:20px;">
+            <span class="badge bg-success mb-2 px-3" style="border-radius:20px;">
             Level {{ current_user.level }}
             </span>
+            <br>
+            {% if engagement_tier == 'high' %}
+            <span class="badge mb-3 px-3" style="background:#6f42c1;border-radius:20px;"
+                title="You are highly engaged — keep it up!">
+            🔥 High Engagement
+            </span>
+            {% elif engagement_tier == 'medium' %}
+            <span class="badge bg-info mb-3 px-3" style="border-radius:20px;"
+                title="You are building a solid habit!">
+            ⚡ Medium Engagement
+            </span>
+            {% else %}
+            <span class="badge bg-warning text-dark mb-3 px-3" style="border-radius:20px;"
+                title="Log more meals to boost your engagement — and earn bonus XP!">
+            🌱 Low Engagement — +50% XP bonus active!
+            </span>
+            {% endif %}
 
             <!-- XP bar -->
             <div class="xp-bar-wrap mb-1">
@@ -147,7 +160,7 @@
     <!-- ── Main content ── -->
     <div class="col-md-8 col-lg-9">
 
-        <!-- Behavioural nudges -->
+        <!-- Behavioral nudges -->
         {% if nudges %}
         <div class="row g-2 mb-4 fade-in-up">
         {% for nudge in nudges %}

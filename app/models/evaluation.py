@@ -13,10 +13,10 @@ from app import db
 
 class UsabilityResponse(db.Model):
     """
-    System Usability Scale (SUS) — 10 standardised questions.
+    System Usability Scale (SUS) — 10 standardized questions.
     Each scored 1–5 (Strongly Disagree → Strongly Agree).
     SUS score = ((sum of odd items - 5) + (25 - sum of even items)) * 2.5
-    A score ≥ 68 is considered above average usability.
+    A score ≥ 70 is considered above average usability.
     """
     __tablename__ = 'usability_responses'
 
@@ -39,12 +39,12 @@ class UsabilityResponse(db.Model):
     # AI coach-specific questions (1–5 Likert)
     ai_coach_motivated   = db.Column(db.Integer)  # Coach Vita made me feel motivated
     ai_coach_useful      = db.Column(db.Integer)  # Coach Vita's feedback was useful
-    ai_coach_personal    = db.Column(db.Integer)  # Coaching felt personalised to me
+    ai_coach_personal    = db.Column(db.Integer)  # Coaching felt personalized to me
     ai_coach_trustworthy = db.Column(db.Integer)  # I trusted Coach Vita's advice
 
     @property
     def sus_score(self):
-        """Calculate standardised SUS score (0–100)."""
+        """Calculate standardized SUS score (0–100)."""
         odd  = [self.q1, self.q3, self.q5, self.q7, self.q9]
         even = [self.q2, self.q4, self.q6, self.q8, self.q10]
         if any(v is None for v in odd + even):

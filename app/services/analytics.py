@@ -126,7 +126,7 @@ def get_sus_summary():
         'mean':        round(sum(scores) / len(scores), 2),
         'min':         round(min(scores), 2),
         'max':         round(max(scores), 2),
-        'above_68':    sum(1 for s in scores if s >= 68),
+        'above_70':    sum(1 for s in scores if s >= 70),
         'ai_coach_mean': round(sum(ai_avgs) / len(ai_avgs), 2) if ai_avgs else None,
         'grades':      {
             'Excellent': sum(1 for s in scores if s >= 85),

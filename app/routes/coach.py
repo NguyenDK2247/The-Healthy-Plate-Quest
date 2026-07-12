@@ -4,7 +4,7 @@ from flask_login import login_required, current_user
 from app import db
 from app.models.food_log import FoodLog
 from app.models.quest import Quest, UserQuest
-from app.services.ai_coach import chat_with_coach, generate_personalised_quest
+from app.services.ai_coach import chat_with_coach, generate_personalized_quest
 from app.services.gamification import award_xp, build_reward_summary
 
 coach_bp = Blueprint('coach', __name__)
@@ -73,11 +73,11 @@ def clear():
 @coach_bp.route('/generate-quest', methods=['POST'])
 @login_required
 def generate_quest():
-    """Generate a personalised AI quest for the current user."""
+    """Generate a personalized AI quest for the current user."""
     recent_foods = get_recent_foods(current_user.id)
 
     try:
-        quest_data = generate_personalised_quest(current_user, recent_foods)
+        quest_data = generate_personalized_quest(current_user, recent_foods)
     except Exception:
         flash('Could not generate a quest right now. Please try again later.', 'warning')
         return redirect(url_for('quests.index'))
@@ -126,5 +126,5 @@ def generate_quest():
     # Small XP bonus
     award_xp(current_user, 5, reason='Generated AI quest')
 
-    flash(f'{quest.icon} New personalised quest generated: {quest.title}!', 'success')
+    flash(f'{quest.icon} New personalized quest generated: {quest.title}!', 'success')
     return redirect(url_for('quests.index'))

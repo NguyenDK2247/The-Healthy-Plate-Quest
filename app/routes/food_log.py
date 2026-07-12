@@ -11,6 +11,15 @@ from app.services.gamification import (
 
 food_log_bp = Blueprint('food_log', __name__)
 
+# Lazy import for personalization
+def _maybe_update_profile(user):
+    try:
+        from app.services.personalization import should_update_profile, update_user_profile
+        if should_update_profile(user):
+            update_user_profile(user)
+    except Exception:
+        pass  # Never let personalization break food logging
+
 # Lazy import to avoid circular imports
 def _get_meal_feedback(user, log):
     try:
@@ -23,7 +32,7 @@ def _get_meal_feedback(user, log):
 # ─── USDA FoodData Central search ───────────────────────────────────────────
 import requests
 
-USDA_API_KEY = 'FcjpycpiZSCaYOHivFV2C7fb8clKcPKAekYvHAHm'
+USDA_API_KEY = 'DEMO_KEY'   # Free — swap for a real key at https://fdc.nal.usda.gov/api-guide.html
 
 def search_usda(query, max_results=8):
     """Search USDA FoodData Central and return simplified results."""
@@ -195,6 +204,9 @@ def index():
             flash(msg, cat)
 
         flash(f'✅ {food_name} logged successfully!', 'success')
+
+        # Trigger dynamic profile update every 5 meals (non-blocking)
+        _maybe_update_profile(current_user)
 
         # Generate AI meal feedback (non-blocking — skip if API unavailable)
         feedback = _get_meal_feedback(current_user, log)

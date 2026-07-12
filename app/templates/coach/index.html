@@ -169,7 +169,7 @@
             <div style="font-size:2rem">✨</div>
             <h6 class="fw-bold mt-1 mb-1">Generate My Quest</h6>
             <p class="text-muted small mb-3">
-            Let Coach Vita create a personalised weekly challenge just for you,
+            Let Coach Vita create a personalized weekly challenge just for you,
             based on your goals and favourite foods.
             </p>
             <form action="{{ url_for('coach.generate_quest') }}" method="POST">
@@ -232,7 +232,7 @@ function appendMessage(role, text) {
         wrapper.innerHTML = `
         <div class="d-flex gap-2 align-items-start">
             <div class="coach-avatar">🤖</div>
-            <div class="bubble bubble-coach">${escHtml(text).replace(/\n/g,'<br>')}</div>
+            <div class="bubble bubble-coach">${renderCoachText(text)}</div>
         </div>`;
     }
     chatWindow.appendChild(wrapper);
@@ -258,6 +258,20 @@ function appendTyping() {
 function removeTyping() {
     const el = document.getElementById('typingIndicator');
     if (el) el.remove();
+}
+
+function renderCoachText(text) {
+    // Render the disclaimer line in muted italic style
+    let html = escHtml(text);
+    // Convert the disclaimer separator
+    html = html.replace(/---/g, '<hr style="border-color:rgba(0,0,0,.1);margin:.5rem 0;">');
+    // Convert bold **text**
+    html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    // Convert italic *text* (including disclaimer)
+    html = html.replace(/\*(.*?)\*/g, '<em class="text-muted" style="font-size:.8rem;">$1</em>');
+    // Convert newlines
+    html = html.replace(/\n/g, '<br>');
+    return html;
 }
 
 function escHtml(str) {

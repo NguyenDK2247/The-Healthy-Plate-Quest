@@ -3,7 +3,7 @@ from flask_login import login_required, current_user
 from app.models.food_log import FoodLog
 from app.models.quest import UserQuest
 from app.models.leaderboard import LeaderboardEntry
-from app.services.gamification import assign_daily_quests, assign_weekly_quests, check_streak_protection
+from app.services.gamification import assign_daily_quests, assign_weekly_quests, check_streak_protection, get_engagement_tier, get_xp_multiplier
 from app.services.nudges import generate_nudges, get_weekly_summary
 
 dashboard_bp = Blueprint('dashboard', __name__)
@@ -33,11 +33,13 @@ def index():
             LeaderboardEntry.xp_this_week > my_entry.xp_this_week
         ).count() + 1
 
-    # Phase 6: Behavioural nudges + weekly summary
+    # Phase 6: Behavioral nudges + weekly summary
     nudges         = generate_nudges(current_user, today_totals)
     weekly_summary = get_weekly_summary(current_user)
 
     streak_shield_available = check_streak_protection(current_user)
+    engagement_tier  = get_engagement_tier(current_user)
+    xp_multiplier    = get_xp_multiplier(current_user)
 
     return render_template('dashboard/index.html',
                            today_totals=today_totals,
@@ -47,7 +49,9 @@ def index():
                            my_entry=my_entry,
                            nudges=nudges,
                            weekly_summary=weekly_summary,
-                           streak_shield_available=streak_shield_available)
+                           streak_shield_available=streak_shield_available,
+                           engagement_tier=engagement_tier,
+                           xp_multiplier=xp_multiplier)
 
 
 from flask import request, flash, redirect, url_for

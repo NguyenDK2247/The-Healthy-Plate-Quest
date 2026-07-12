@@ -1,8 +1,8 @@
 """
-nudges.py — Behavioural science nudge engine for The Healthy Plate Quest.
+nudges.py — Behavioral science nudge engine for The Healthy Plate Quest.
 
 Based on:
-    - BJ Fogg's Behaviour Model (Motivation × Ability × Prompt)
+    - BJ Fogg's Behavior Model (Motivation × Ability × Prompt)
     - Self-Determination Theory (Autonomy, Competence, Relatedness)
     - Variable reward schedules (Skinner)
     - Loss aversion (Kahneman & Tversky)
@@ -32,7 +32,7 @@ from app.models.food_log import FoodLog
 
 def generate_nudges(user, today_totals=None):
     """
-    Generate a prioritised list of contextual nudges for the current user.
+    Generate a prioritized list of contextual nudges for the current user.
     Returns up to 3 nudges, sorted by priority descending.
     """
     nudges = []
@@ -166,7 +166,7 @@ def generate_nudges(user, today_totals=None):
                 'type':     'tip',
                 'icon':     '🌈',
                 'title':    'Try eating the rainbow today!',
-                'message':  'Aim for 5 different coloured foods — it unlocks the Rainbow Plate quest and earns bonus XP.',
+                'message':  'Aim for 5 different colored foods — it unlocks the Rainbow Plate quest and earns bonus XP.',
                 'action':   'View quests',
                 'url':      'quests.index',
                 'priority': 3,
@@ -190,7 +190,7 @@ def generate_nudges(user, today_totals=None):
             'type':     'streak',
             'icon':     '🔥',
             'title':    f'{streak}-day streak — incredible!',
-            'message':  "You're building a real habit. Research shows that 7+ day streaks are a strong predictor of long-term behaviour change. Keep it up!",
+            'message':  "You're building a real habit. Research shows that 7+ day streaks are a strong predictor of long-term behavior change. Keep it up!",
             'action':   None,
             'url':      None,
             'priority': 4,
@@ -203,7 +203,7 @@ def generate_nudges(user, today_totals=None):
             'type':     'tip',
             'icon':     '🎯',
             'title':    "It's Monday — set your week up for success!",
-            'message':  'Check your active quests and ask Coach Vita to generate a personalised challenge just for you.',
+            'message':  'Check your active quests and ask Coach Vita to generate a personalized challenge just for you.',
             'action':   'Talk to Coach Vita',
             'url':      'coach.index',
             'priority': 6,

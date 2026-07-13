@@ -4,11 +4,13 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class Config:
-    SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-fallback-secret'
+    class ProductionConfig(Config):
+        SECRET_KEY = os.environ.get('SECRET_KEY')
+        if not SECRET_KEY:
+            raise ValueError("SECRET_KEY environment variable must be set in production")
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
         'sqlite:///healthy_plate_quest.db'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    ANTHROPIC_API_KEY = os.environ.get('ANTHROPIC_API_KEY')  # kept for reference
     GROQ_API_KEY = os.environ.get('GROQ_API_KEY')
 
 class DevelopmentConfig(Config):

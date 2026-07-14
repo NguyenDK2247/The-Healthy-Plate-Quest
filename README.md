@@ -59,11 +59,7 @@ flask init-db
 
 ### 6. Run the application
 
-An important step is to run this command first,
-```bash
-venv\Scripts\activate
-```
-in order to activate the virtual environment. The recommended terminal is the **command prompt**. Then, execute this command to run the program:
+The recommended terminal is the **command prompt**. Execute this command to run the program:
 
 ```bash
 python run.py

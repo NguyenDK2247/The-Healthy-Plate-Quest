@@ -4,10 +4,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class Config:
-    class ProductionConfig(Config):
-        SECRET_KEY = os.environ.get('SECRET_KEY')
-        if not SECRET_KEY:
-            raise ValueError("SECRET_KEY environment variable must be set in production")
+    SECRET_KEY = os.environ.get('SECRET_KEY')
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
         'sqlite:///healthy_plate_quest.db'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
@@ -18,6 +15,8 @@ class DevelopmentConfig(Config):
 
 class ProductionConfig(Config):
     DEBUG = False
+    if not os.environ.get('SECRET_KEY'):
+        raise ValueError("SECRET_KEY environment variable must be set in production")
 
 config = {
     'development': DevelopmentConfig,

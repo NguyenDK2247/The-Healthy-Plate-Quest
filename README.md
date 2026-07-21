@@ -31,11 +31,17 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
+> **Note:** The AI coach uses the `openai` Python package as an HTTP client to communicate with Groq's API. This is expected - no OpenAI account or API key is required.
+
 ### 4. Configure environment variables
 
-Copy the example file and fill in your values:
+Create a `.env` file in the project root:
 
 ```bash
+# Windows
+copy .env.example .env
+
+# macOS / Linux
 cp .env.example .env
 ```
 
@@ -53,13 +59,21 @@ GROQ_API_KEY=your-groq-api-key-here
 
 ### 5. Initialize the database
 
+The recommended terminal is **Command Prompt** (not PowerShell) on Windows.
+
 ```bash
+# Windows
+set FLASK_APP=run.py
+flask init-db
+
+# macOS / Linux
+export FLASK_APP=run.py
 flask init-db
 ```
 
-### 6. Run the application
+This creates all database tables and seeds the default quests and badges.
 
-The recommended terminal is the **command prompt**. Execute this command to run the program:
+### 6. Run the application
 
 ```bash
 python run.py

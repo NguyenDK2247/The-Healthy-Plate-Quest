@@ -16,7 +16,7 @@ cd The-Healthy-Plate-Quest
 ### 2. Create and activate a virtual environment
 
 ```bash
-# Windows (Command Prompt — recommended over PowerShell)
+# Windows (Command Prompt - recommended over PowerShell)
 python -m venv venv
 venv\Scripts\activate
 
@@ -24,6 +24,12 @@ venv\Scripts\activate
 python3 -m venv venv
 source venv/bin/activate
 ```
+
+> **Note (Windows):** If you have multiple Python installations (e.g. Anaconda alongside a standalone Python), use the full path to a specific Python when creating the venv to avoid conflicts:
+> ```cmd
+> C:\Python313\python.exe -m venv venv
+> ```
+> Run `where python` to see which installations you have, or `py -0` to list all available versions.
 
 ### 3. Install dependencies
 
